@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     default: "EduLaunchBox",
   },
   description:
-    "EduLaunchBox is the first platform on the OpenEdu blockchain that empowers  developers to launch tokens and dApps on the OpenEdu blockchain.",
+    "Create new tokens, migrate existing tokens and token holders from other EVM chains, and instantly deploy liquidity on EDUCHAIN.",
   openGraph: {
     siteName: "EduLaunchBox",
     url: "https://www.edulaunchbox.app",
