@@ -1,113 +1,143 @@
-import Image from 'next/image'
+"use client";
+
+import { FiPlusCircle } from "react-icons/fi";
+import { HiOutlineArrowCircleDown } from "react-icons/hi";
+import etheriumLogo from "./assets/images/etherium.png";
+import bnbLogo from "./assets/images/bnb.png";
+import solanaLogo from "./assets/images/solana.png";
+import polygonLogo from "./assets/images/polygon.png";
+import Image from "next/image";
 
 export default function Home() {
-  return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
+  const ActionCard = ({ action }: { action: "create" | "migrate" }) => {
+    const actionAttr = {
+      create: {
+        title: "Create Token & Liquidity",
+        text: "Deploy token for your community on EDUCHAIN in 3 simple steps. tokens are EVM compatible and can be migrated to any ecosystem",
+      },
+      migrate: {
+        title: "Migrate Token, Holders & Liquidity",
+        text: "Migrate already deployed tokens from other chains to the EDUCHAIN. Access hands on tools to manage tokens and incentivize your communities",
+      },
+    };
+
+    return (
+      <button
+        className={
+          (action === "create"
+            ? "text-grey/50 bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-[#4FA2EB] to-[#274ACC]"
+            : "text-grey/700 bg-white") +
+          "  h-40 relative flex flex-col gap-2 rounded-xl px-8 pt-4 basis-1/2 drop-shadow"
+        }
+      >
+        {/* Migrate backgraound */}
+        {/* {action === "migrate" && (
+          <div className="flex w-80 absolute -z-10">
+            <div className="flex w-full bg-blue-300">
+              ddddddddddddddddddddddddddddddddddddd
+            </div>
+            <div className="flex w-full bg-blue-300">
+              ddddddddddddddddddddddddddddddddddddd
+            </div>
+            <div className="flex w-full bg-blue-300">
+              ddddddddddddddddddddddddddddddddddddd
+            </div>
+          </div>
+        )} */}
+
+        <div className="flex gap-2">
+          {action === "create" ? (
+            <FiPlusCircle size={"1.75rem"} className="my-auto" />
+          ) : (
+            <HiOutlineArrowCircleDown size={"1.75rem"} className="my-auto" />
+          )}
+          <span className="flex text-[1.5rem] my-auto font-bold">
+            {actionAttr[action].title}
+          </span>
+        </div>
+        <span className="flex text-pretty text-left text-[0.875rem]">
+          {actionAttr[action].text}
+        </span>
+      </button>
+    );
+  };
+
+  const SupportedChainCard = ({
+    logo,
+    chain,
+    live,
+  }: {
+    logo: any;
+    chain: string;
+    live?: boolean;
+  }) => {
+    return (
+      <div className="flex text-grey/800 flex-col gap-2 p-4 rounded-xl bg-grey/50 drop-shadow">
+        <div className="flex justify-between w-full">
+          <div className="flex gap-2">
             <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
+              className="w-8 h-8 my-auto object-fit rounded-lg"
+              src={logo}
+              alt={chain}
             />
-          </a>
+            <span className="flex my-auto text-primary/300 font-bold">
+              {chain}
+            </span>
+          </div>
+          <span
+            className={
+              (live
+                ? "text-green bg-light-green/30 "
+                : "text-brown bg-light-brown/30 ") +
+              " flex font-medium text-[0.75rem] rounded-2xl h-6 px-4"
+            }
+          >
+            <span className="my-auto mx-auto">
+              {live ? "Live" : "Coming soon"}
+            </span>
+          </span>
+        </div>
+        <span className="flex w-56 text-[0.875rem]">
+          Migrate your token, holders and liquidity from {chain}
+        </span>
+      </div>
+    );
+  };
+
+  return (
+    <section className="flex px-10 py-6 flex-col gap-8">
+      {/* CTAs */}
+      <div className="flex text-grey/700 flex-col gap-6">
+        <div className="flex flex-col font-medium">
+          <h1 className="text-[2rem] font-bold">
+            Migrate Token, Holders and Liquidity to EDUCHAIN.
+          </h1>
+          <span className="">With community incentive included</span>
+        </div>
+        <div className="flex gap-5">
+          <ActionCard action={"create"} />
+          <ActionCard action={"migrate"} />
         </div>
       </div>
 
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 before:lg:h-[360px] z-[-1]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
+      {/* Supported Chains */}
+      <div className="flex text-grey/700 flex-col gap-4">
+        <div className="flex flex-col">
+          <h2 className="text-[1.5rem] font-bold">Supported chains</h2>
+          <span className="">
+            Migrate into EDUCHAIN from any of the chains listed below.
+          </span>
+        </div>
+        <div className="flex gap-4">
+          <SupportedChainCard logo={etheriumLogo} chain="Etherium" live />
+          <SupportedChainCard logo={bnbLogo} chain="BNB Chain" />
+          <SupportedChainCard logo={solanaLogo} chain="Solana" />
+          <SupportedChainCard logo={polygonLogo} chain="Polygon" />
+        </div>
       </div>
 
-      <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Docs{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Learn{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Templates{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Explore the Next.js 13 playground.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Deploy{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
-  )
+      {/* FAQs */}
+      <div></div>
+    </section>
+  );
 }
