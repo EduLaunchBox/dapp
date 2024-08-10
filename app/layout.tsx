@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     url: "https://www.edulaunchbox.app",
     images: [
       {
-        url: "https://www.edulaunchbox.app/assets/images/og.png",
+        url: "https://www.edulaunchbox.app/og.png",
       },
     ],
     locale: "en_US",
