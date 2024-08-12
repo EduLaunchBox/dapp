@@ -1,10 +1,6 @@
 import "./globals.css";
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import NavBar from "./sections/navbar";
-import SideNav from "./sections/sidenav";
-
-const inter = Inter({ subsets: ["latin"] });
+import App from "./App";
 
 export const metadata: Metadata = {
   title: {
@@ -33,13 +29,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={"font-cabinet_grotesk text-grey/700 flex w-full h-full"}>
-        <SideNav />
-        <div className="flex flex-col w-full bg-primary/50">
-          <NavBar />
-          <div>{children}</div>
-        </div>
-      </body>
+      <App>{children}</App>
     </html>
   );
 }

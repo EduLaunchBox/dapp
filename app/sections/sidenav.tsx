@@ -84,7 +84,7 @@ export default function SideNav() {
             Engage with us to become a part of our community and partner with us
           </span>
           <div className="flex gap-6">
-            <Link href={""}>
+            <Link href={"https://twitter.com/EduLaunchBox"}>
               <BsTwitterX size={"1.5rem"} />
             </Link>
             <Link href={""}>
