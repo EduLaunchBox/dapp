@@ -1,22 +1,49 @@
 "use client";
-
 import { Button } from "@/app/components/buttons";
 import FormContainer from "@/app/components/formContainer";
-import { Input, Label, SelectInput } from "@/app/components/inputsBoxes";
+import { Input, Label } from "@/app/components/inputsBoxes";
+import { useAppDispatch } from "@/app/store/hooks";
 import { useState } from "react";
 import { AiOutlineInfoCircle } from "react-icons/ai";
 import { CiSettings } from "react-icons/ci";
 
-export default function VerifyTokenDetailsForm() {
-  const [projectCategory, setProjectCategory] = useState("");
+export default function VerifyTokenDetailsForm({
+  formStep,
+  verificationStep,
+  nextStep,
+  prevStep,
+}: {
+  formStep: number;
+  verificationStep: number;
+  nextStep: any;
+  prevStep: any;
+}) {
   const [tokenName, setTokenName] = useState("");
   const [tokenSymbol, setTokenSymbol] = useState("");
-
   const [tokenSupply, setTokenSupply] = useState<number>();
-  const [decimal, setDecimal] = useState<number>();
+
+  const dispatch = useAppDispatch();
+
+  const handleNext = (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    event.preventDefault();
+    dispatch(nextStep());
+  };
+
+  const handlePrev = (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    event.preventDefault();
+    dispatch(prevStep());
+  };
 
   return (
-    <FormContainer className="flex w-full p-4 flex-col gap-8" currentState={1}>
+    <FormContainer
+      stateToShow={verificationStep === 2 ? 1 : 0}
+      className="flex w-full p-4 flex-col gap-8"
+      currentState={formStep}
+    >
       <div className="flex">
         <span className="flex text-grey/800 font-bold">
           Verify token details and Migrate to EDU
@@ -88,8 +115,8 @@ export default function VerifyTokenDetailsForm() {
       </div>
 
       <div className="flex justify-between gap-6">
-        <Button text={"Previous"} arrow={"backward"} />
-        <Button text={"Next"} color="green" />
+        <Button onclick={handlePrev} text={"Previous"} arrow={"backward"} />
+        <Button onclick={handleNext} text={"Next"} color="green" />
       </div>
     </FormContainer>
   );

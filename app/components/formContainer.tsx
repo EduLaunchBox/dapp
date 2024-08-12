@@ -6,13 +6,20 @@ export default function FormContainer({
   children,
   currentState,
   className,
+  stateToShow,
 }: {
   children?: React.ReactNode;
   className?: string;
   currentState: number;
+  stateToShow: number; // the state that this form should show at
 }) {
   return (
-    <form className="flex p-[0.2rem] rounded-3xl bg-grey/50">
+    <form
+      className={
+        (stateToShow === currentState ? "flex " : "hidden") +
+        " p-[0.2rem] rounded-3xl bg-grey/50"
+      }
+    >
       <div className="border border-primary/100 shadow-inner shadow-grey/50 rounded-3xl w-full flex flex-col bg-gradient-to-b from-primary/100/70 from-5% via-primary/100/50 via-10% to-white to-20%">
         <div className="flex gap-8 border-b border-primary/100 px-6 py-4 rounded-t-3xl">
           {["Token Details", "Socials", "Deploy", "Liquidity"].map(

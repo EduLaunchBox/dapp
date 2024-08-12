@@ -151,7 +151,7 @@ export default function Home() {
           </span>
         </div>
         <div className="flex flex-col gap-2 max-h-[20rem] overflow-y-auto">
-          <FAQDropdown question="How old is Edulaunch?" />
+          <FAQDropdown question="What is EDU lauanchbox?" />
           <FAQDropdown question="Why should I use EDUlaunchBox" />
           <FAQDropdown question="What are the Fees?" />
           <FAQDropdown question="My Chain is not supported yet" />

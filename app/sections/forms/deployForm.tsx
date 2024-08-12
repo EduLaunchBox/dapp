@@ -5,8 +5,42 @@ import Image from "next/image";
 import defaultImage from "../../assets/images/default_token.svg";
 import successfulDeployment from "../../assets/images/successfulDeployment.svg";
 import { MdOutlineNorthEast } from "react-icons/md";
+import { useAppDispatch } from "@/app/store/hooks";
+import { useState } from "react";
 
-export default function DeployForm() {
+export default function DeployForm({
+  formStep,
+  nextStep,
+  prevStep,
+}: {
+  formStep: number;
+  nextStep: any;
+  prevStep: any;
+}) {
+  const dispatch = useAppDispatch();
+  const [tokenDeployed, setTokenDeployed] = useState(false);
+
+  const handleNext = (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    event.preventDefault();
+    dispatch(nextStep());
+  };
+
+  const handlePrev = (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    event.preventDefault();
+    dispatch(prevStep());
+  };
+
+  const handleDeploy = (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    event.preventDefault();
+    setTokenDeployed(true);
+  };
+
   const DetailRow = ({
     title,
     value,
@@ -25,10 +59,12 @@ export default function DeployForm() {
       </div>
     );
   };
+
   return (
     <FormContainer
+      stateToShow={3}
       className="flex w-full p-6 flex-col justify-between gap-4"
-      currentState={1}
+      currentState={formStep}
     >
       <div className="flex flex-col gap-4">
         <span className="flex font-bold text-grey/800">Token Details</span>
@@ -50,45 +86,60 @@ export default function DeployForm() {
         </div>
 
         {/* For when deployed */}
-        <div className="flex flex-col bg-primary/50 border-2 border-primary/100 rounded-xl pb-2">
-          <div className="mx-auto flex ">
-            <Image src={successfulDeployment} alt="Successful Deployment" />
-          </div>
-          <span className="flex mx-auto text-secondary/700 font-bold">
-            Token successfully deployed
-          </span>
-        </div>
+        {tokenDeployed && (
+          <>
+            <div className="flex flex-col bg-primary/50 border-2 border-primary/100 rounded-xl pb-2">
+              <div className="mx-auto flex ">
+                <Image src={successfulDeployment} alt="Successful Deployment" />
+              </div>
+              <span className="flex mx-auto text-secondary/700 font-bold">
+                Token successfully deployed
+              </span>
+            </div>
 
-        <div className="flex gap-6 justify-between">
-          <span className="flex font-bold text-grey/800 my-auto">Contract</span>
-          {/* Max string length the length of below value */}
-          <div className="flex gap-4">
-            <DetailRow
-              className="my-auto"
-              title="Token address"
-              value="0x61299774020dA44..."
-            />
-            <button className="flex p-2 border-2 border-grey/200 bg-grey/70 my-auto rounded-lg">
-              <MdOutlineNorthEast />
-            </button>
-          </div>
-        </div>
+            <div className="flex gap-6 justify-between">
+              <span className="flex font-bold text-grey/800 my-auto">
+                Contract
+              </span>
+              {/* Max string length the length of below value */}
+
+              <div className="flex gap-4">
+                <DetailRow
+                  className="my-auto"
+                  title="Token address"
+                  value="0x61299774020dA44..."
+                />
+                <button className="flex p-2 border-2 border-grey/200 bg-grey/70 my-auto rounded-lg">
+                  <MdOutlineNorthEast />
+                </button>
+              </div>
+            </div>
+          </>
+        )}
       </div>
 
-      <div className="flex w-full pt-4 gap-6">
-        <div className="flex basis-1/4">
-          <Button text={"Edit"} arrow={"backward"} />
-        </div>
+      {!tokenDeployed && (
+        <div className="flex w-full pt-4 gap-6">
+          <div className="flex basis-1/4">
+            <Button onclick={handlePrev} text={"Edit"} arrow={"backward"} />
+          </div>
 
-        <div className="flex basis-3/4">
-          <Button text={"Deploy"} color="green" />
+          <div className="flex basis-3/4">
+            <Button onclick={handleDeploy} text={"Deploy"} color="green" />
+          </div>
         </div>
-      </div>
+      )}
 
       {/* For when deployed */}
-      <div className="flex w-full pt-4">
-        <Button text={"Add Liquidity on DEX"} color="green" />
-      </div>
+      {tokenDeployed && (
+        <div className="flex w-full pt-4">
+          <Button
+            onclick={handleNext}
+            text={"Add Liquidity on DEX"}
+            color="green"
+          />
+        </div>
+      )}
     </FormContainer>
   );
 }

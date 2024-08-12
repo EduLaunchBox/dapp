@@ -6,11 +6,13 @@ export function Button({
   text,
   color,
   onclick,
+  className,
 }: {
   arrow?: "forward" | "backward";
   text: string;
   color?: "white" | "green";
   onclick?: MouseEventHandler<HTMLButtonElement>;
+  className?: string;
 }) {
   return (
     <button
@@ -18,7 +20,8 @@ export function Button({
         (color === "green"
           ? "bg-secondary/700 text-grey/50 "
           : " border-2 border-grey/200 text-grey/800 ") +
-        " flex justify-center w-full p-2 rounded-lg font-semibold "
+        " flex justify-center w-full p-2 rounded-lg font-semibold " +
+        className
       }
       onClick={onclick}
     >

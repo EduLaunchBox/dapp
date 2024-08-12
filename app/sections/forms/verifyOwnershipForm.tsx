@@ -2,15 +2,37 @@
 import { Button } from "@/app/components/buttons";
 import FormContainer from "@/app/components/formContainer";
 import { Input, SelectInput } from "@/app/components/inputsBoxes";
+import { useAppDispatch } from "@/app/store/hooks";
 import { useState } from "react";
 
-export default function VerifyOwnershipForm() {
+export default function VerifyOwnershipForm({
+  formStep,
+  verificationStep,
+  verificationNext,
+}: {
+  formStep: number;
+  verificationStep: number;
+  verificationNext: any;
+}) {
   const [network, setNetwork] = useState("");
   const [tokenType, setTokenType] = useState("");
   const [tokenContractAdd, setTokenContractAdd] = useState("");
 
+  const dispatch = useAppDispatch();
+
+  const handleSign = (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    event.preventDefault();
+    dispatch(verificationNext());
+  };
+
   return (
-    <FormContainer className="flex w-full p-4 flex-col gap-8" currentState={1}>
+    <FormContainer
+      stateToShow={verificationStep === 1 ? 1 : 0}
+      className="flex w-full p-4 flex-col gap-8"
+      currentState={formStep}
+    >
       <div className="flex">
         <span className="flex text-grey/800 font-bold">
           Verify Token Ownership and details
@@ -47,7 +69,12 @@ export default function VerifyOwnershipForm() {
       </div>
 
       <div className="flex flex-col gap-2 pt-4 w-full">
-        <Button text={"Sign message"} color="green" arrow={"forward"} />
+        <Button
+          onclick={handleSign}
+          text={"Sign message"}
+          color="green"
+          arrow={"forward"}
+        />
         <span className="flex mx-auto text-grey/700 text-[0.75rem] font-medium">
           Proves that you are the token deployer
         </span>
