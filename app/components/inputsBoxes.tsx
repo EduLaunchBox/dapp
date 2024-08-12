@@ -1,11 +1,10 @@
 "use client";
-import { Dispatch, SetStateAction, useState } from "react";
+import React, { Children, Dispatch, SetStateAction, useState } from "react";
 import { AiOutlineInfoCircle } from "react-icons/ai";
 import { FaPaste } from "react-icons/fa";
 import { FiUploadCloud } from "react-icons/fi";
-import { MdOutlineEast, MdOutlineSouthWest } from "react-icons/md";
 
-function Label({ text, htmlFor }: { text: string; htmlFor: string }) {
+export function Label({ text, htmlFor }: { text: string; htmlFor: string }) {
   return (
     <label className="flex justify-between w-full" htmlFor={htmlFor}>
       <span className="font-semibold my-auto">{text}</span>
@@ -24,6 +23,52 @@ function ErrSpan({ text, show }: { text: string; show: boolean }) {
   );
 }
 
+export function SelectInput({
+  errMsg,
+  id,
+  value,
+  setValue,
+  labelName,
+  children,
+}: {
+  errMsg?: string;
+  labelName: string;
+  id: string;
+  value?: string;
+  setValue: Dispatch<SetStateAction<string>>;
+  children: React.ReactNode;
+}) {
+  const [isActive, setIsActive] = useState<boolean>(false);
+  const [isHoveredOver, setIsHoveredOver] = useState<boolean>(false);
+
+  return (
+    <div className="flex flex-col gap-2">
+      <Label text={labelName} htmlFor={id} />
+      <div
+        className={
+          (isHoveredOver ? "  border-primary/200 " : "") +
+          (isActive ? " bg-primary/50 " : "") +
+          " flex flex-row border rounded-lg"
+        }
+      >
+        <select
+          className="flex w-full bg-transparent outline-none p-2 text-grey/300"
+          id={id}
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          onBlur={() => setIsActive(false)}
+          onFocus={() => setIsActive(true)}
+          onMouseEnter={() => setIsHoveredOver(true)}
+          onMouseLeave={() => setIsHoveredOver(false)}
+        >
+          {children}
+        </select>
+      </div>
+      <ErrSpan show={Boolean(errMsg)} text={errMsg || ""} />
+    </div>
+  );
+}
+
 export function Input({
   type,
   errMsg,
@@ -32,21 +77,27 @@ export function Input({
   value,
   setValue,
   inputType,
+  labelName,
+  className,
+  disabled,
 }: {
   type?: "default" | "link" | "paste";
   errMsg?: string;
   inputType?: string;
+  labelName: string;
   id: string;
-  placeholder: string;
-  value: string;
-  setValue: Dispatch<SetStateAction<string>>;
+  placeholder?: string;
+  value?: string | number;
+  setValue: Dispatch<SetStateAction<any>>;
+  className?: string;
+  disabled?: boolean;
 }) {
   const [isActive, setIsActive] = useState<boolean>(false);
   const [isHoveredOver, setIsHoveredOver] = useState<boolean>(false);
 
   return (
-    <div className="flex flex-col gap-4">
-      <Label text="Token Name" htmlFor="default" />
+    <div className={(className ? className : "") + " flex flex-col gap-2"}>
+      <Label text={labelName} htmlFor={id} />
       <div
         className={
           (isHoveredOver ? "  border-primary/200 " : "") +
@@ -55,7 +106,7 @@ export function Input({
         }
       >
         {/* Checks Intended Input type and displays appropriate inpute prefix */}
-        {type === "link" ? (
+        {type === "link" && (
           <span
             className={
               (isActive ? " border-primary/200 " : "") +
@@ -64,19 +115,20 @@ export function Input({
           >
             <span className="text-grey/800">https://</span>
           </span>
-        ) : (
-          <span className="p-3">
-            <MdOutlineSouthWest size={"1.2rem"} />
-          </span>
         )}
 
         <input
-          className="flex w-full bg-transparent outline-none"
+          className="flex w-full bg-transparent outline-none placeholder-grey/300 p-2"
           placeholder={placeholder}
           id={id}
           value={value}
           type={inputType || "text"}
-          onChange={(e) => setValue(e.target.value)}
+          disabled={disabled}
+          onChange={(e) =>
+            setValue(
+              inputType === "number" ? Number(e.target.value) : e.target.value
+            )
+          }
           onBlur={() => setIsActive(false)}
           onFocus={() => setIsActive(true)}
           onMouseEnter={() => setIsHoveredOver(true)}
@@ -84,17 +136,15 @@ export function Input({
         />
 
         {/* Checks the type to display appropriate surfix */}
-        {type === "paste" ? (
-          <button className="flex gap-2 bg-secondary/700 rounded-md m-[0.3rem] py-2 px-4">
-            <span>
-              <FaPaste color="#fff" size={"1.2rem"} />
+        {type === "paste" && (
+          <button className="flex gap-2 bg-secondary/700 rounded-md m-[0.3rem] py-[0.2rem] px-4">
+            <span className="flex my-auto">
+              <FaPaste color="#fff" size={"1rem"} />
             </span>
-            <span className="text-white font-semibold">Paste</span>
+            <span className="text-white font-semibold text-[0.875rem] flex my-auto">
+              Paste
+            </span>
           </button>
-        ) : (
-          <span className="p-3">
-            <MdOutlineEast size={"1.2rem"} className="text-grey/500" />
-          </span>
         )}
       </div>
       <ErrSpan show={Boolean(errMsg)} text={errMsg || ""} />
@@ -104,11 +154,9 @@ export function Input({
 
 // Edit means there is an existing image or placeholder
 export function ImageInput({
-  edit,
   labelText,
   id,
 }: {
-  edit: boolean;
   id: string;
   labelText: string;
 }) {
@@ -116,7 +164,7 @@ export function ImageInput({
     <div className="flex gap-2 flex-col">
       <Label text={labelText} htmlFor={id} />
       <label
-        className="border-2 border border-dashed rounded-md flex p-4 gap-4 justify-between"
+        className="border-2 border border-dashed rounded-md flex px-6 py-10 gap-4 justify-between"
         htmlFor={id}
       >
         <div className="flex basis-1/4">
@@ -128,10 +176,10 @@ export function ImageInput({
         </div>
         <div className="flex basis-1/2">
           <div className="flex flex-col w-full">
-            <span className="flex flex-nowrap mx-auto text-center text-grey/900 font-bold">
+            <span className="flex flex-nowrap mx-auto text-center text-grey/900 font-bold text-[0.875rem] text-nowrap">
               Choose a file or drag and drop logo here
             </span>
-            <span className="flex flex-nowrap mx-auto text-center text-grey/100 text-[0.875rem]">
+            <span className="flex flex-nowrap mx-auto text-center text-grey/100 text-[0.75rem] text-nowrap">
               SVG or png file not exceeding 3mb
             </span>
           </div>

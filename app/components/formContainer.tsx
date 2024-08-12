@@ -5,8 +5,10 @@ import { IoCheckmark } from "react-icons/io5";
 export default function FormContainer({
   children,
   currentState,
+  className,
 }: {
   children?: React.ReactNode;
+  className?: string;
   currentState: number;
 }) {
   return (
@@ -30,7 +32,7 @@ export default function FormContainer({
             )
           )}
         </div>
-        <div className="flex h-80 rounded-b-3xl">{children}</div>
+        <div className={className}>{children}</div>
       </div>
     </form>
   );
