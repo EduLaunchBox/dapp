@@ -33,3 +33,24 @@ export function Button({
     </button>
   );
 }
+
+export function ToggleButton({
+  isTrue,
+  onclick,
+}: {
+  isTrue: boolean;
+  onclick?: MouseEventHandler<HTMLButtonElement>;
+}) {
+  return (
+    <button
+      type={"button"}
+      onClick={onclick}
+      className={
+        (isTrue ? "pl-[1.4rem] " : "pl-[0.2rem] ") +
+        " flex transition[padding] duration-200 ease-in-out w-11 h-6 rounded-xl bg-grey/100-alt shadow-inner px-[0.2rem]"
+      }
+    >
+      <span className="flex w-5 h-5 bg-grey/50 rounded-full drop-shadow my-auto"></span>
+    </button>
+  );
+}
