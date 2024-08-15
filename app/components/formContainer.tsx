@@ -1,5 +1,3 @@
-import { Dispatch, SetStateAction, useState } from "react";
-import { BsCurrencyDollar } from "react-icons/bs";
 import { IoCheckmark } from "react-icons/io5";
 
 export default function FormContainer({
