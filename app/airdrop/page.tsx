@@ -25,7 +25,8 @@ export default function Airdrop() {
             ? "border border-secondPlace bg-secondPlace/30 rounded-2xl"
             : rank === 3
             ? "border border-thirdPlace bg-thirdPlace/30 rounded-2xl"
-            : "") + " flex w-full justify-between gap-4 py-1.5 pl-3 pr-40"
+            : "") +
+          " flex w-full justify-between gap-4 py-1.5 pl-3 max-lg:pr-28 pr-40"
         }
       >
         <td className={" flex my-auto gap-4 min-w-[6rem] "}>
@@ -87,15 +88,15 @@ export default function Airdrop() {
   };
 
   return (
-    <section className="flex px-10 py-6 ">
+    <section className="flex max-md:px-8 max-sm:px-6 max-xs:px-4 px-10 py-6 ">
       <div className="flex flex-col gap-6 w-full">
         <BannerContainer>
-          <div className="flex w-full h-full gap-4 py-4 px-6">
+          <div className="flex w-full h-full gap-4 py-4 max-ld:px-4 px-6">
             <div className="flex flex-col my-auto">
-              <h1 className="flex text-grey/50 text-[1.75rem] font-extrabold">
+              <h1 className="flex text-grey/50 max-ld:text-[1.25rem] text-[1.75rem] font-extrabold">
                 Airdrop
               </h1>
-              <span className="flex w-56 text-grey/50 text-[0.875rem] text-pretty font-medium">
+              <span className="flex w-56 text-grey/50 max-lg:text-[0.75rem] text-[0.875rem] text-pretty font-medium">
                 Interact with tokens Created and Migrated into EDUCHAIN to rank
                 up.
               </span>
@@ -103,26 +104,26 @@ export default function Airdrop() {
 
             <div className="flex gap-2 py-4">
               <div className="flex px-8 justify-center rounded-xl flex-col border-grey/50/25 border bg-grey/50/5">
-                <span className="flex mx-auto font-bold text-grey/50 text-[0.875rem]">
+                <span className="flex mx-auto font-bold text-grey/50 max-lg:text-[0.75rem] text-[0.875rem]">
                   Box Points earned
                 </span>
-                <span className="flex text-[1.75rem] text-secondary/500 font-extrabold mx-auto">
+                <span className="flex max-lg:text-[1.25rem] text-[1.75rem] text-secondary/500 font-extrabold mx-auto">
                   0.00 EP
                 </span>
               </div>
               <div className="flex px-8 justify-center rounded-xl flex-col border-grey/50/25 border bg-grey/50/5">
-                <span className="flex mx-auto font-bold text-grey/50 text-[0.875rem]">
+                <span className="flex mx-auto font-bold text-grey/50 max-lg:text-[0.75rem] text-[0.875rem]">
                   Your rank
                 </span>
-                <span className="flex text-[1.75rem] text-secondary/500 font-extrabold mx-auto">
+                <span className="flex max-lg:text-[1.25rem] text-[1.75rem] text-secondary/500 font-extrabold mx-auto">
                   26,038
                 </span>
               </div>
               <div className="flex px-8 justify-center rounded-xl flex-col border-grey/50/25 border gap-1 bg-grey/50/5">
-                <h4 className="flex font-extrabold text-grey/50 text-[0.875rem]">
+                <h4 className="flex font-extrabold text-grey/50 max-lg:text-[0.75rem] text-[0.875rem]">
                   How to earn points
                 </h4>
-                <span className="flex flex-col text-grey/50 text-[0.875rem]">
+                <span className="flex flex-col text-grey/50 max-lg:text-[0.75rem] text-[0.875rem]">
                   <ul className="ml-4 list-disc">
                     <li>Bridge EDU over to EDUCHAIN</li>
                     <li>Use Dapps listed on our Leaderboard</li>
@@ -140,7 +141,7 @@ export default function Airdrop() {
         <div className="flex w-full">
           <TableContainer className="flex w-full" title="Ranking">
             <table className="flex flex-col w-full">
-              <thead className="flex w-full border-b border-primary/100 py-3 pl-6 text-grey/700 pr-44">
+              <thead className="flex w-full border-b border-primary/100 py-3 pl-6 text-grey/700 max-lg:pr-32 pr-44">
                 <tr className="flex gap-4 justify-between w-full">
                   <th className="flex min-w-[6rem]">
                     <span className="flex font-semibold text-[0.875rem] text-grey/700 text-nowrap">

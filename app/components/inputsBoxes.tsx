@@ -1,5 +1,5 @@
 "use client";
-import React, { Children, Dispatch, SetStateAction, useState } from "react";
+import React, { Dispatch, SetStateAction, useState } from "react";
 import { AiOutlineInfoCircle } from "react-icons/ai";
 import { FaPaste } from "react-icons/fa";
 import { FiUploadCloud } from "react-icons/fi";
@@ -7,7 +7,9 @@ import { FiUploadCloud } from "react-icons/fi";
 export function Label({ text, htmlFor }: { text: string; htmlFor: string }) {
   return (
     <label className="flex justify-between w-full" htmlFor={htmlFor}>
-      <span className="font-semibold my-auto">{text}</span>
+      <span className="font-semibold my-auto max-sm:text-[0.875rem]">
+        {text}
+      </span>
       <span className="cusor-pointer my-auto">
         <AiOutlineInfoCircle size={"1.2rem"} className="text-grey/500" />
       </span>
@@ -164,7 +166,7 @@ export function ImageInput({
     <div className="flex gap-2 flex-col">
       <Label text={labelText} htmlFor={id} />
       <label
-        className="border-2 border border-dashed rounded-md flex px-6 py-10 gap-4 justify-between"
+        className="border-2 border border-dashed rounded-md flex max-xs:px-3 px-6 py-10 max-xs:gap-2 gap-4 justify-between"
         htmlFor={id}
       >
         <div className="flex basis-1/4">
@@ -176,10 +178,10 @@ export function ImageInput({
         </div>
         <div className="flex basis-1/2">
           <div className="flex flex-col w-full">
-            <span className="flex flex-nowrap mx-auto text-center text-grey/900 font-bold text-[0.875rem] text-nowrap">
+            <span className="flex flex-nowrap mx-auto text-center text-grey/900 font-bold max-xs:text-[0.75rem] text-[0.875rem] text-nowrap">
               Choose a file or drag and drop logo here
             </span>
-            <span className="flex flex-nowrap mx-auto text-center text-grey/100 text-[0.75rem] text-nowrap">
+            <span className="flex flex-nowrap mx-auto text-center text-grey/100 max-xs:text-[0.5rem] text-[0.75rem] text-nowrap">
               SVG or png file not exceeding 3mb
             </span>
           </div>

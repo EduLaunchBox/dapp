@@ -30,7 +30,7 @@ export default function Liquidity() {
     worthUsdt: string;
   }) => {
     return (
-      <tr className="flex w-full gap-4 py-2">
+      <tr className="flex max-lg:w-fit w-full grow gap-4 py-2">
         <td className="flex my-auto min-w-[10rem]">
           <span className="flex w-full gap-3">
             <Image
@@ -38,17 +38,19 @@ export default function Liquidity() {
               src={logo}
               alt={token}
             />
-            <span className="flex text-grey/700 font-medium">{token}</span>
+            <span className="flex text-grey/700 max-lg:text-[0.875rem] font-medium">
+              {token}
+            </span>
           </span>
         </td>
-        <td className="flex my-auto min-w-[4rem]">
-          <span className="flex text-[0.875rem] text-grey/700 font-medium">
+        <td className="flex my-auto max-lg:min-w-[3rem] min-w-[4rem]">
+          <span className="flex max-lg:text-[0.75rem] text-[0.875rem] text-grey/700 font-medium">
             {symbol}
           </span>
         </td>
-        <td className="flex my-auto min-w-[9rem]">
+        <td className="flex my-auto max-lg:min-w-[7rem] min-w-[9rem]">
           <span className="flex gap-2">
-            <span className="flex text-grey/700 text-[0.875rem] my-auto font-medium">
+            <span className="flex text-grey/700 max-lg:text-[0.75rem] text-[0.875rem] my-auto font-medium">
               {address}
             </span>
             <button className="flex my-auto">
@@ -56,36 +58,40 @@ export default function Liquidity() {
             </button>
           </span>
         </td>
-        <td className="flex my-auto min-w-[8rem]">
+        <td className="flex my-auto max-lg:min-w-[6rem] min-w-[8rem]">
           <span className="flex w-full gap-2">
             <Image
               className="flex w-6 h-6 rounded-full object-fit"
               src={dexLogo}
               alt={dex}
             />
-            <span className="flex text-grey/700 text-[0.875rem] font-medium">
+            <span className="flex text-grey/700 max-lg:text-[0.75rem] text-[0.875rem] font-medium">
               {dex}
             </span>
           </span>
         </td>
-        <td className="flex my-auto w-full">
+        <td className="flex grow my-auto max-lg:w-[15rem] w-full">
           {!hasLiquity && (
-            <span className="flex text-[0.875rem] font-medium text-grey/700">
+            <span className="flex max-lg:text-[0.75rem] text-[0.875rem] text-nowrap font-medium text-grey/700">
               No Liquidity
             </span>
           )}
           {hasLiquity && (
-            <span className="flex text-[0.875rem] font-medium text-grey/700 gap-2">
-              <span>{eduAmt}</span>
-              <span>+</span>
-              <span>{uniAmt}</span>
-              <span>({worthUsdt})</span>
+            <span className="flex flex-nowrap max-lg:text-[0.75rem] text-[0.875rem] font-medium text-grey/700 gap-2">
+              <span className="text-nowrap">{eduAmt}</span>
+              <span className="text-nowrap">+</span>
+              <span className="text-nowrap">{uniAmt}</span>
+              <span className="text-nowrap">({worthUsdt})</span>
             </span>
           )}
         </td>
-        <td className="flex my-auto min-w-[8rem]">
+        <td className="flex my-auto max-lg:min-w-[6rem] min-w-[8rem]">
           <span className="flex w-full my-auto ">
-            <Button text="Add Liquidity" color="green" />
+            <Button
+              text="Add Liquidity"
+              color="green"
+              className="text-nowrap text-[0.875rem]"
+            />
           </span>
         </td>
       </tr>
@@ -93,13 +99,13 @@ export default function Liquidity() {
   };
 
   return (
-    <section className="flex px-10 py-6 ">
+    <section className="flex max-md:px-8 max-sm:px-6 max-xs:px-4 px-10 py-6 ">
       <div className="flex flex-col gap-6 w-full">
         <div className="flex flex-col gap-2">
-          <h1 className="flex text-[2rem] text-grey/800 font-bold">
+          <h1 className="flex max-md:text-[1.5rem] text-[2rem] text-grey/800 font-bold">
             Liquidity
           </h1>
-          <span className="flex text-grey-700">
+          <span className="flex max-md:text-[0.875rem] text-grey-700">
             Liquidity is added to your deployed token Against the EDU tokens. LP
             is added at the rate of 0.002 Per token
           </span>
@@ -107,38 +113,38 @@ export default function Liquidity() {
 
         <div className="flex w-full">
           <TableContainer
-            className="flex w-full"
+            className="flex w-full max-lg:overflow-x-auto"
             title="Deployed/Migrated tokens"
           >
             <table className="flex flex-col w-full">
-              <thead className="flex w-full border-b border-primary/100 py-3 px-6 font-medium text-grey/700">
+              <thead className="flex border-b max-lg:w-fit w-full border-primary/100 py-3 px-6 font-medium text-grey/700">
                 <tr className="flex gap-4 w-full">
-                  <th className="flex min-w-[10rem]">
+                  <th className="flex max-lg:text-[0.875rem] min-w-[10rem]">
                     <span className="flex font-medium text-grey/700 text-nowrap">
                       Token name + Symbol
                     </span>
                   </th>
-                  <th className="flex min-w-[4rem]">
+                  <th className="flex max-lg:min-w-[3rem] max-lg:text-[0.875rem] min-w-[4rem]">
                     <span className="flex font-medium text-grey/700 text-nowrap">
                       Symbol
                     </span>
                   </th>
-                  <th className="flex min-w-[9rem]">
+                  <th className="flex max-lg:min-w-[7rem] max-lg:text-[0.875rem] min-w-[9rem]">
                     <span className="flex font-medium text-grey/700 text-nowrap">
                       Token address
                     </span>
                   </th>
-                  <th className="flex min-w-[8rem]">
+                  <th className="flex max-lg:min-w-[6rem] max-lg:text-[0.875rem] min-w-[8rem]">
                     <span className="flex font-medium text-grey/700 text-nowrap">
                       DEX
                     </span>
                   </th>
-                  <th className="flex w-full">
+                  <th className="flex max-lg:w-[15rem] max-lg:text-[0.875rem] w-full">
                     <span className="flex font-medium text-grey/700 text-nowrap">
                       Liquidity
                     </span>
                   </th>
-                  <th className="flex min-w-[8rem]">
+                  <th className="flex max-lg:min-w-[6rem] min-w-[8rem] max-lg:text-[0.875rem]">
                     <span className="flex font-medium text-grey/700 text-nowrap">
                       Action
                     </span>

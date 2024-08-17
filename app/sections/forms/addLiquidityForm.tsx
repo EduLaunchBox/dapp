@@ -50,7 +50,9 @@ export default function AddLiquidityForm({ formStep }: { formStep: number }) {
         </SelectInput>
 
         <div className="flex flex-col gap-2">
-          <span className="flex font-medium text-grey/700">Quote Token</span>
+          <span className="flex font-medium text-grey/700 max-sm:text-[0.875rem]">
+            Quote Token
+          </span>
           <TokenInput logo={eduLogo} symbol={"EDU"} balance={"10,685.83"} />
         </div>
 
@@ -59,7 +61,9 @@ export default function AddLiquidityForm({ formStep }: { formStep: number }) {
         </div>
 
         <div className="flex flex-col gap-2">
-          <span className="flex font-medium text-grey/700">Base Token</span>
+          <span className="flex font-medium text-grey/700 max-sm:text-[0.875rem]">
+            Base Token
+          </span>
           <TokenInput logo={uniLogo} symbol={"UNI"} balance={"10,685.83"} />
         </div>
 
@@ -119,11 +123,11 @@ const PriceAndPool = ({
   return (
     <div className="flex w-full flex-col rounded-3xl border bg-grey/70 border-primary/100">
       <div className="flex w-full border-b border-primary/100 py-2 ">
-        <span className="flex mx-auto font-bold text-grey/700">
+        <span className="flex mx-auto font-bold max-sm:text-[0.875rem] text-grey/700">
           Price & Pool share
         </span>
       </div>
-      <div className="flex justify-around py-4">
+      <div className="flex justify-around max-sm:text-[0.875rem] py-4">
         <div className="flex flex-col">
           <span className="flex mx-auto text-grey/900 font-bold">2,038</span>
           <span className="flex text-grey/500 font-bold">
@@ -158,7 +162,7 @@ const TokenInput = ({
     <div className="flex flex-col w-full bg-grey/70 border border-grey/200 rounded-3xl px-3 py-2">
       <div className="flex w-full gap-2">
         <input
-          className="flex w-full bg-transparent border-none leading-none outline-none text-[2rem] font-medium placeholder-grey/400"
+          className="flex w-full bg-transparent border-none leading-none outline-none max-sm:text-[1.5rem] text-[2rem] font-medium placeholder-grey/400"
           placeholder="0.00"
         />
         <button className="flex h-fit py-[0.2rem] rounded-full border border-grey/200 bg-grey/100-alt my-auto">
@@ -167,15 +171,15 @@ const TokenInput = ({
             src={logo}
             alt={symbol}
           />
-          <span className="flex uppercase font-bold my-auto pr-6 pl-1 text-primary/500">
+          <span className="flex uppercase max-sm:text-[0.875rem] font-bold my-auto pr-6 pl-1 text-primary/500">
             {symbol}
           </span>
         </button>
       </div>
 
-      <div className="flex w-full justify-between text-grey/400">
+      <div className="flex w-full justify-between text-grey/400 max-sm:text-[0.875rem]">
         <span>$0.00</span>
-        <div className="flex gap-4">
+        <div className="flex max-sm:text-[0.875rem] max-sm:gap-2 gap-4">
           <div>
             <span>Balance: </span>
             <span>{balance}</span>

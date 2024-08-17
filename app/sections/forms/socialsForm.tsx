@@ -34,7 +34,7 @@ export default function SocialsForm({
   return (
     <FormContainer
       stateToShow={2}
-      className="flex w-full p-6 flex-col gap-4"
+      className="flex w-full max-sm:p-4 p-6 flex-col gap-4"
       currentState={formStep}
     >
       <ImageInput labelText={"Token Logo"} id={"tokenName"} />
@@ -47,7 +47,7 @@ export default function SocialsForm({
         setValue={setTwitterUrl}
       />
 
-      <div className="flex justify-between pt-4 gap-6">
+      <div className="flex justify-between max-sm:pt-0 pt-4 gap-6">
         <Button onclick={handlePrev} text={"Previous"} arrow={"backward"} />
         <Button
           onclick={handleNext}

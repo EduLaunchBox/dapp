@@ -10,13 +10,29 @@ import DropSvg from "../assets/images/drop";
 import StarSvg from "../assets/images/star";
 import CoinSvg from "../assets/images/coin";
 import { CodeSvg } from "../assets/images/code";
+import { IoIosArrowBack } from "react-icons/io";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
+import { toggleMenu } from "../store/slice/appSlice";
 
 export default function SideNav() {
+  const { isMenuOpen } = useAppSelector((state) => state.app);
+  const dispatch = useAppDispatch();
+
+  const handleToggleMenu = (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    event.preventDefault();
+    dispatch(toggleMenu());
+  };
+
   const Logo = () => {
     return (
-      <div className="flex border-2 border-primary/100 px-2 py-2 bg-primary/50 rounded-lg">
+      <Link
+        href={"/"}
+        className="flex border-2 border-primary/100 px-2 py-2 bg-primary/50 rounded-lg"
+      >
         <Image className="" src={EdulaunchLogo} alt="Edulaunch" />
-      </div>
+      </Link>
     );
   };
 
@@ -31,8 +47,7 @@ export default function SideNav() {
   }) => {
     const pathname = usePathname();
     const active = useMemo(() => {
-      if (href === "") return true;
-      return href && pathname.includes(href);
+      return pathname === href;
     }, [href, pathname]);
 
     return (
@@ -61,16 +76,27 @@ export default function SideNav() {
   };
 
   return (
-    <section className="flex min-h-screen">
-      <div className="flex flex-col px-3 py-2 justify-between gap-8 border-r-2 border-primary/100 m-[0.15rem]">
+    <section
+      className={(isMenuOpen ? " flex " : " hidden  ") + " min-h-screen"}
+    >
+      {/* Opened Menu */}
+      <div className="relative flex flex-col px-3 py-2 justify-between gap-8 border-r-2 border-primary/100 m-[0.15rem]">
         {/* Logo */}
         <div>
           <Logo />
         </div>
 
+        {/* Collapse */}
+        <button
+          onClick={handleToggleMenu}
+          className="absolute right-[-1rem] top-[3.5rem] flex justify-center max-w-fit max-h-fit p-2 rounded-full bg-grey/50 border border-primary/100"
+        >
+          <IoIosArrowBack size={"1.2rem"} color="#ADADAD" />
+        </button>
+
         {/* Navlinks */}
         <div className="flex h-full flex-col gap-2">
-          <NavItem href="" text="tokens" logo={CoinsSvg} />
+          <NavItem href="/" text="tokens" logo={CoinsSvg} />
           <NavItem href="/liquidity" text="liquidity" logo={DropSvg} />
           <NavItem href="/leaderboard" text="leaderboard" logo={StarSvg} />
           <NavItem href="/airdrop" text="airdrop" logo={CoinSvg} />
