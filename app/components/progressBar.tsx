@@ -36,7 +36,7 @@ const CustomCheckbox = ({
       )}
 
       <div className="flex absolute top-[1rem]">
-        <span className="flex text-nowrap my-2 text-grey/700 font-medium">
+        <span className="flex text-nowrap my-2 max-sm:text-[0.875rem] text-grey/700 font-medium">
           {label}
         </span>
       </div>
@@ -54,7 +54,9 @@ export function TwoStepBar({
   return (
     <div className="flex justify-center gap-0 w-full mx-auto">
       <CustomCheckbox status={stepOne.status} label={stepOne.name} />
-      <div className={" flex w-[15rem] bg-grey/200 h-0.5 my-auto"}>
+      <div
+        className={" flex max-sm:w-[12rem] w-[15rem] bg-grey/200 h-0.5 my-auto"}
+      >
         <span
           className={
             (stepTwo.status === "undone" ? "w-0 " : "w-full ") +

@@ -2,11 +2,13 @@
 import { configureStore } from "@reduxjs/toolkit";
 import createTokenReducer from "./slice/createToken";
 import migrateTokenReducer from "./slice/migrateToken";
+import generalAppReducer from "./slice/appSlice";
 
 export const store = configureStore({
   reducer: {
     createToken: createTokenReducer,
     migrateToken: migrateTokenReducer,
+    app: generalAppReducer,
   },
 });
 

@@ -68,7 +68,7 @@ export default function VerifyOwnershipForm({
         </SelectInput>
       </div>
 
-      <div className="flex flex-col gap-2 pt-4 w-full">
+      <div className="flex flex-col gap-2 max-sm:pt-1 pt-4 w-full">
         <Button
           onclick={handleSign}
           text={"Sign message"}

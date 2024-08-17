@@ -10,9 +10,9 @@ export default function CreateTokens() {
   const { formStep } = useAppSelector((state) => state.createToken);
 
   return (
-    <section className="flex px-10 py-6 ">
+    <section className="flex max-md:px-8 max-sm:px-6 max-xs:px-4 px-10 py-6 ">
       <div className="flex w-full flex-col gap-4">
-        <h1 className="flex text-[1.75rem] text-grey/700 font-semibold">
+        <h1 className="flex px-1 max-sm:text-[1.2rem] text-[1.75rem] text-grey/700 font-semibold">
           Create/Deploy token on EDUCHAIN
         </h1>
         <div className="flex flex-col gap-6 mx-auto">
