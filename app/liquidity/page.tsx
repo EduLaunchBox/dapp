@@ -1,9 +1,11 @@
+"use client";
 import Image from "next/image";
 import TableContainer from "../components/tableContainer";
 import { MdOutlineNorthEast } from "react-icons/md";
 import { Button } from "../components/buttons";
 import logo from "../assets/images/uni-blue.png";
 import sailfishLogo from "../assets/images/sailfish.png";
+import Link from "next/link";
 
 export default function Liquidity() {
   const TableRow = ({
@@ -30,7 +32,7 @@ export default function Liquidity() {
     worthUsdt: string;
   }) => {
     return (
-      <tr className="flex max-lg:w-fit w-full grow gap-4 py-2">
+      <tr className="flex max-xl:w-fit w-full grow gap-4 py-2">
         <td className="flex my-auto min-w-[10rem]">
           <span className="flex w-full gap-3">
             <Image
@@ -70,7 +72,7 @@ export default function Liquidity() {
             </span>
           </span>
         </td>
-        <td className="flex grow my-auto max-lg:w-[15rem] w-full">
+        <td className="flex grow my-auto max-xl:w-[15rem] w-full">
           {!hasLiquity && (
             <span className="flex max-lg:text-[0.75rem] text-[0.875rem] text-nowrap font-medium text-grey/700">
               No Liquidity
@@ -86,13 +88,16 @@ export default function Liquidity() {
           )}
         </td>
         <td className="flex my-auto max-lg:min-w-[6rem] min-w-[8rem]">
-          <span className="flex w-full my-auto ">
+          <Link
+            href={"/liquidity/add-liquidity"}
+            className="flex w-full my-auto "
+          >
             <Button
               text="Add Liquidity"
               color="green"
               className="text-nowrap text-[0.875rem]"
             />
-          </span>
+          </Link>
         </td>
       </tr>
     );
@@ -113,11 +118,11 @@ export default function Liquidity() {
 
         <div className="flex w-full">
           <TableContainer
-            className="flex w-full max-lg:overflow-x-auto"
+            className="flex w-full max-xl:overflow-x-auto"
             title="Deployed/Migrated tokens"
           >
             <table className="flex flex-col w-full">
-              <thead className="flex border-b max-lg:w-fit w-full border-primary/100 py-3 px-6 font-medium text-grey/700">
+              <thead className="flex border-b max-xl:w-fit w-full border-primary/100 py-3 px-6 font-medium text-grey/700">
                 <tr className="flex gap-4 w-full">
                   <th className="flex max-lg:text-[0.875rem] min-w-[10rem]">
                     <span className="flex font-medium text-grey/700 text-nowrap">
@@ -139,7 +144,7 @@ export default function Liquidity() {
                       DEX
                     </span>
                   </th>
-                  <th className="flex max-lg:w-[15rem] max-lg:text-[0.875rem] w-full">
+                  <th className="flex max-xl:w-[15rem] max-lg:text-[0.875rem] w-full">
                     <span className="flex font-medium text-grey/700 text-nowrap">
                       Liquidity
                     </span>

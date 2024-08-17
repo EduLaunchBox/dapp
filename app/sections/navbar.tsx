@@ -7,10 +7,11 @@ import Image from "next/image";
 import { IoIosArrowBack } from "react-icons/io";
 import { useAppSelector, useAppDispatch } from "../store/hooks";
 import { toggleMenu } from "../store/slice/appSlice";
+import Link from "next/link";
+import { TiChevronRight } from "react-icons/ti";
 
 export default function NavBar() {
   const pathname = usePathname();
-  const { isMenuOpen } = useAppSelector((state) => state.app);
   const dispatch = useAppDispatch();
 
   const handleToggleMenu = (
@@ -21,7 +22,14 @@ export default function NavBar() {
   };
 
   const pathextract = useMemo(() => {
-    return pathname.split("/").map((str) => str.split("-").join(" "));
+    let extract: string[] = pathname.includes("-tokens") ? ["Tokens"] : [];
+    extract = [
+      ...extract,
+      ...pathname.split("/").map((str) => str.split("-").join(" ")),
+    ];
+    console.log(extract);
+
+    return extract;
   }, [pathname]);
 
   return (
@@ -29,12 +37,12 @@ export default function NavBar() {
       <div className="flex gap-2">
         {/* Closed menu */}
         <div
-          className={
-            (isMenuOpen ? " hidden " : " flex ") +
-            " p-[0.05rem] bg-grey/50 rounded-br-2xl"
-          }
+          className={"max-lg:flex hidden p-[0.05rem] bg-grey/50 rounded-br-2xl"}
         >
-          <div className="relative flex flex-col px-3 py-2 justify-between gap-8 border-r-2 border-b-2 rounded-br-2xl border-primary/100 m-[0.15rem] bg-grey/50">
+          <Link
+            href={"/"}
+            className="relative flex flex-col px-3 py-2 justify-between gap-8 border-r-2 border-b-2 rounded-br-2xl border-primary/100 m-[0.15rem] bg-grey/50"
+          >
             <Image className="w-10 h-10" src={MiniLogo} alt="Edulaunchbox" />
 
             <button
@@ -43,11 +51,28 @@ export default function NavBar() {
             >
               <IoIosArrowBack size={"1rem"} color="#ADADAD" />
             </button>
-          </div>
+          </Link>
         </div>
-        <span className="text-primary/300 font-medium my-auto capitalize">
-          {pathname === "/" ? "Tokens" : pathextract}
-        </span>
+        {pathname === "/" && (
+          <span className="text-primary/300 font-medium my-auto capitalize">
+            Tokens
+          </span>
+        )}
+
+        {pathname !== "/" &&
+          pathextract.map((extract, index, arr) => {
+            if (extract === "") return <></>;
+            return (
+              <div className="flex gap-1 flex-nowrap" key={index}>
+                <span className="text-primary/300 font-medium my-auto capitalize">
+                  {extract}
+                </span>
+                {index + 1 < arr.length && (
+                  <TiChevronRight className="my-auto" />
+                )}
+              </div>
+            );
+          })}
       </div>
       <div className="flex max-sm:w-28 w-36 my-auto">
         <Button text="Connect Wallet" color="green" />

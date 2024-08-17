@@ -13,6 +13,7 @@ import { CodeSvg } from "../assets/images/code";
 import { IoIosArrowBack } from "react-icons/io";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { toggleMenu } from "../store/slice/appSlice";
+import TokenSplitting from "./popovers/tokenSplitting";
 
 export default function SideNav() {
   const { isMenuOpen } = useAppSelector((state) => state.app);
@@ -24,14 +25,19 @@ export default function SideNav() {
     event.preventDefault();
     dispatch(toggleMenu());
   };
+  const pathname = usePathname();
 
   const Logo = () => {
     return (
       <Link
         href={"/"}
-        className="flex border-2 border-primary/100 px-2 py-2 bg-primary/50 rounded-lg"
+        className="flex max-md:w-fit border-2 border-primary/100 px-2 py-2 bg-primary/50 rounded-lg"
       >
-        <Image className="" src={EdulaunchLogo} alt="Edulaunch" />
+        <Image
+          className="max-md:w-[10rem]"
+          src={EdulaunchLogo}
+          alt="Edulaunch"
+        />
       </Link>
     );
   };
@@ -40,21 +46,18 @@ export default function SideNav() {
     href,
     text,
     logo,
+    active,
   }: {
     href: string;
     text: string;
+    active: boolean;
     logo: any;
   }) => {
-    const pathname = usePathname();
-    const active = useMemo(() => {
-      return pathname === href;
-    }, [href, pathname]);
-
     return (
       <Link
         href={href}
         className={
-          (active ? "bg-primary/50 " : "") + "flex w-full p-2 rounded-lg gap-2"
+          (active ? "bg-primary/50 " : "") + " flex w-full p-2 rounded-lg gap-2"
         }
       >
         <span>
@@ -66,7 +69,7 @@ export default function SideNav() {
         <span
           className={
             (active ? "text-primary/500 font-bold " : "") +
-            "flex capitalize text-[1.2rem] "
+            "flex capitalize max-md:text-[1rem] text-[1.2rem] "
           }
         >
           {text}
@@ -77,7 +80,11 @@ export default function SideNav() {
 
   return (
     <section
-      className={(isMenuOpen ? " flex " : " hidden  ") + " min-h-screen"}
+      className={
+        (isMenuOpen
+          ? " flex max-lg:fixed max-lg:left-0 max-lg:top-0 max-lg:z-50 max-lg:bg-grey/50 "
+          : " hidden ") + " min-h-screen"
+      }
     >
       {/* Opened Menu */}
       <div className="relative flex flex-col px-3 py-2 justify-between gap-8 border-r-2 border-primary/100 m-[0.15rem]">
@@ -89,27 +96,54 @@ export default function SideNav() {
         {/* Collapse */}
         <button
           onClick={handleToggleMenu}
-          className="absolute right-[-1rem] top-[3.5rem] flex justify-center max-w-fit max-h-fit p-2 rounded-full bg-grey/50 border border-primary/100"
+          className="hidden max-lg:flex absolute right-[-1rem] top-[3.5rem] justify-center max-w-fit max-h-fit p-2 rounded-full bg-grey/50 border border-primary/100"
         >
           <IoIosArrowBack size={"1.2rem"} color="#ADADAD" />
         </button>
 
         {/* Navlinks */}
         <div className="flex h-full flex-col gap-2">
-          <NavItem href="/" text="tokens" logo={CoinsSvg} />
-          <NavItem href="/liquidity" text="liquidity" logo={DropSvg} />
-          <NavItem href="/leaderboard" text="leaderboard" logo={StarSvg} />
-          <NavItem href="/airdrop" text="airdrop" logo={CoinSvg} />
-          <NavItem href="/dev" text="dev" logo={CodeSvg} />
+          <NavItem
+            active={pathname === "/" || pathname.includes("-tokens")}
+            href="/"
+            text="tokens"
+            logo={CoinsSvg}
+          />
+          <NavItem
+            active={pathname.includes("/liquidity")}
+            href="/liquidity"
+            text="liquidity"
+            logo={DropSvg}
+          />
+          <NavItem
+            active={pathname.includes("/leaderboard")}
+            href="/leaderboard"
+            text="leaderboard"
+            logo={StarSvg}
+          />
+          <NavItem
+            active={pathname.includes("/airdrop")}
+            href="/airdrop"
+            text="airdrop"
+            logo={CoinSvg}
+          />
+          <NavItem
+            active={pathname.includes("/dev")}
+            href="/dev"
+            text="dev"
+            logo={CodeSvg}
+          />
         </div>
 
         {/* Footer Card */}
-        <div className="flex flex-col w-full bg-primary/500 text-grey/50 rounded-2xl p-4 gap-4">
-          <span className="flex font-bold">Connect with us</span>
-          <span className="flex w-[12rem] text-[0.875rem] text-pretty">
+        <div className="flex flex-col w-full bg-primary/500 text-grey/50 rounded-2xl p-4 max-md:gap-2 gap-4">
+          <span className="flex max-md:text-[0.875rem] font-bold">
+            Connect with us
+          </span>
+          <span className="flex max-md:w-[9rem] w-[12rem] max-md:text-[0.75rem] text-[0.875rem] text-pretty">
             Engage with us to become a part of our community and partner with us
           </span>
-          <div className="flex gap-6">
+          <div className="flex max-md:gap-4 gap-6">
             <Link href={"https://twitter.com/EduLaunchBox"}>
               <BsTwitterX size={"1.5rem"} />
             </Link>
@@ -123,6 +157,7 @@ export default function SideNav() {
           </div>
         </div>
       </div>
+      {/* <TokenSplitting /> */}
     </section>
   );
 }

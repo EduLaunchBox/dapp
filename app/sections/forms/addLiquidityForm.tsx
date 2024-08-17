@@ -16,7 +16,7 @@ export default function AddLiquidityForm({ formStep }: { formStep: number }) {
 
   return (
     <FormContainer
-      stateToShow={4}
+      stateToShow={formStep === -1 ? -1 : 4}
       className="flex w-full p-4 flex-col gap-8"
       currentState={formStep}
     >

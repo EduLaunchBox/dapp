@@ -19,24 +19,36 @@ export default function FormContainer({
       }
     >
       <div className="border border-primary/100 shadow-inner shadow-grey/50 rounded-3xl w-full flex flex-col bg-gradient-to-b from-primary/100/70 from-5% via-primary/100/50 via-10% to-white to-20%">
-        <div className="flex max-sm:gap-6 max-xs:gap-4 gap-8 border-b border-primary/100 max-sx:justify-between px-6 py-4 rounded-t-3xl">
-          {["Token Details", "Socials", "Deploy", "Liquidity"].map(
-            (text, index) => (
-              <FormSteps
-                key={index}
-                text={text}
-                step={index + 1}
-                state={
-                  currentState === index + 1
-                    ? "doing"
-                    : index + 1 > currentState
-                    ? "undone"
-                    : "done"
-                }
-              />
-            )
-          )}
-        </div>
+        {/* Using negative numbers to represent when i do not want it to show those steps */}
+        {currentState !== -1 && (
+          <div className="flex max-sm:gap-6 max-xs:gap-4 gap-8 border-b border-primary/100 max-sx:justify-between px-6 py-4 rounded-t-3xl">
+            {["Token Details", "Socials", "Deploy", "Liquidity"].map(
+              (text, index) => (
+                <FormSteps
+                  key={index}
+                  text={text}
+                  step={index + 1}
+                  state={
+                    currentState === index + 1
+                      ? "doing"
+                      : index + 1 > currentState
+                      ? "undone"
+                      : "done"
+                  }
+                />
+              )
+            )}
+          </div>
+        )}
+
+        {/* Negative 1 is for add liquidity */}
+        {currentState === -1 && (
+          <div className="flex gap-8 border-b border-primary/100 px-6 py-4 rounded-t-3xl">
+            <span className="mx-auto font-bold text-primary/500 max-md:text-[1rem] text-[1.2rem]">
+              Add Liquidity
+            </span>
+          </div>
+        )}
         <div className={className}>{children}</div>
       </div>
     </form>

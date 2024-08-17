@@ -72,19 +72,19 @@ export default function Leaderboard() {
     <section className="flex max-md:px-8 max-sm:px-6 max-xs:px-4 px-10 py-6 ">
       <div className="flex flex-col gap-6 w-full">
         <BannerContainer>
-          <div className="flex w-full h-full gap-4 py-4 px-6">
+          <div className="flex max-sm:flex-col w-full h-full max-sm:gap-2 gap-4 py-4 px-6">
             <div className="flex flex-col my-auto">
               <h1 className="flex text-grey/50 max-lg:text-[1.25rem] text-[1.75rem] font-extrabold">
                 Leaderboard
               </h1>
-              <span className="flex max-md:w-44 w-56 text-grey/50 max-lg:text-[0.75rem] text-[0.875rem] text-pretty font-medium">
+              <span className="flex max-sm:w-full max-md:w-44 w-56 text-grey/50 max-lg:text-[0.75rem] text-[0.875rem] text-pretty font-medium">
                 Earn points to incentivize your community to engage with your
                 Dapp on EDUCHAIN.
               </span>
             </div>
 
-            <div className="flex gap-2 py-4">
-              <div className="flex max-md:px-10 px-16 justify-center rounded-xl flex-col border-grey/50/25 border bg-grey/50/5">
+            <div className="flex gap-2 max-xs:flex-col py-4">
+              <div className="flex max-xs:w-full max-xs:py-2 max-md:px-10 px-16 justify-center rounded-xl flex-col border-grey/50/25 border bg-grey/50/5">
                 <span className="flex mx-auto font-bold text-grey/50 max-lg:text-[0.75rem] text-[0.875rem]">
                   Box Points
                 </span>
@@ -92,7 +92,7 @@ export default function Leaderboard() {
                   0.00
                 </span>
               </div>
-              <div className="flex px-8 justify-center rounded-xl flex-col border-grey/50/25 border gap-1 bg-grey/50/5">
+              <div className="flex px-8 max-xs:w-full max-xs:py-2 justify-center rounded-xl flex-col border-grey/50/25 border gap-1 bg-grey/50/5">
                 <h4 className="flex font-extrabold text-grey/50 max-lg:text-[0.75rem] text-[0.875rem]">
                   How to earn points
                 </h4>
