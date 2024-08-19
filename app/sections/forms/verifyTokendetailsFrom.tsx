@@ -3,6 +3,8 @@ import { Button } from "@/app/components/buttons";
 import FormContainer from "@/app/components/formContainer";
 import { Input, Label } from "@/app/components/inputsBoxes";
 import { useAppDispatch } from "@/app/store/hooks";
+import { TokenDetails } from "@/app/types";
+import { ActionCreatorWithPayload } from "@reduxjs/toolkit";
 import { useState } from "react";
 import { AiOutlineInfoCircle } from "react-icons/ai";
 import { CiSettings } from "react-icons/ci";
@@ -12,11 +14,13 @@ export default function VerifyTokenDetailsForm({
   verificationStep,
   nextStep,
   prevStep,
+  tokenDetails,
 }: {
   formStep: number;
   verificationStep: number;
-  nextStep: any;
+  nextStep: ActionCreatorWithPayload<TokenDetails, any>;
   prevStep: any;
+  tokenDetails: TokenDetails;
 }) {
   const [tokenName, setTokenName] = useState("");
   const [tokenSymbol, setTokenSymbol] = useState("");
@@ -28,7 +32,7 @@ export default function VerifyTokenDetailsForm({
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     event.preventDefault();
-    dispatch(nextStep());
+    dispatch(nextStep({ ...tokenDetails }));
   };
 
   const handlePrev = (

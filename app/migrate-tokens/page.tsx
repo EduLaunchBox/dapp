@@ -13,7 +13,7 @@ import {
 } from "../store/slice/migrateToken";
 
 export default function MigrateTokens() {
-  const { formStep, verificationStep } = useAppSelector(
+  const { formStep, verificationStep, tokenDetails } = useAppSelector(
     (state) => state.migrateToken
   );
 
@@ -34,16 +34,19 @@ export default function MigrateTokens() {
             verificationStep={verificationStep}
             nextStep={nextStep}
             prevStep={verificationPrev}
+            tokenDetails={tokenDetails}
           />
           <SocialsForm
             formStep={formStep}
             nextStep={nextStep}
             prevStep={prevStep}
+            tokenDetails={tokenDetails}
           />
           <DeployForm
             formStep={formStep}
             nextStep={nextStep}
             prevStep={prevStep}
+            tokenDetails={tokenDetails}
           />
           <AddLiquidityForm formStep={formStep} />
         </div>
