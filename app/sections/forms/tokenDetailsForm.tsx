@@ -3,6 +3,8 @@ import { Button } from "@/app/components/buttons";
 import FormContainer from "@/app/components/formContainer";
 import { Input, SelectInput } from "@/app/components/inputsBoxes";
 import { useAppDispatch } from "@/app/store/hooks";
+import { TokenDetails } from "@/app/types";
+import { ActionCreatorWithPayload } from "@reduxjs/toolkit";
 import React, { useState } from "react";
 
 export default function TokenDetailsForm({
@@ -10,11 +12,12 @@ export default function TokenDetailsForm({
   nextStep,
 }: {
   formStep: number;
-  nextStep: any;
+  nextStep: ActionCreatorWithPayload<TokenDetails, any>;
 }) {
   const [projectCategory, setProjectCategory] = useState("");
   const [tokenName, setTokenName] = useState("");
   const [tokenSymbol, setTokenSymbol] = useState("");
+  const [errMsg, setErrMsg] = useState("");
 
   const [tokenSupply, setTokenSupply] = useState<number>();
   const [decimal, setDecimal] = useState<number>();
@@ -24,7 +27,32 @@ export default function TokenDetailsForm({
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     event.preventDefault();
-    dispatch(nextStep());
+
+    // Verifications
+    let errorMessage: string = "";
+    if (projectCategory === "")
+      errorMessage = "Please select a project category";
+    if (tokenName === "") errorMessage = "Please provide a token name.";
+    if (tokenSymbol === "") errorMessage = "Please provide a token symbol.";
+    if (!tokenSupply) errorMessage = "Token supply must be greater than 0";
+    if (!decimal) errorMessage = "Decimal must be greater than 0.";
+
+    if (errorMessage !== "") {
+      alert(errorMessage);
+      setErrMsg(errorMessage);
+      return;
+    }
+
+    // Save in redux
+    dispatch(
+      nextStep({
+        projectCategory,
+        tokenName,
+        tokenSymbol,
+        tokenSupply: Number(tokenSupply),
+        decimal: Number(decimal),
+      })
+    );
   };
 
   return (

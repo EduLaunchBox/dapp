@@ -158,10 +158,27 @@ export function Input({
 export function ImageInput({
   labelText,
   id,
+  setImage,
 }: {
   id: string;
   labelText: string;
+  setImage: Dispatch<any>;
 }) {
+  const [preview, setPreview] = useState<any>();
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target?.files?.[0];
+    const reader = new FileReader();
+    reader.onloadend = async () => {
+      const base64String = reader.result;
+      setImage(base64String);
+    };
+    if (file) {
+      reader.readAsDataURL(file);
+      setPreview(file);
+    }
+  };
+
   return (
     <div className="flex gap-2 flex-col">
       <Label text={labelText} htmlFor={id} />
@@ -188,7 +205,7 @@ export function ImageInput({
         </div>
         <div className="flex basis-1/4"></div>
       </label>
-      <input id={id} type="file" className="hidden" />
+      <input id={id} type="file" onChange={handleChange} className="hidden" />
     </div>
   );
 }

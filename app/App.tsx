@@ -8,7 +8,7 @@ import { store } from "./store";
 export default function App({ children }: { children: React.ReactNode }) {
   return (
     <Provider store={store}>
-      <body
+      <div
         className={
           "font-cabinet_grotesk relative text-grey/700 flex w-full h-full"
         }
@@ -18,7 +18,7 @@ export default function App({ children }: { children: React.ReactNode }) {
           <NavBar />
           <div>{children}</div>
         </div>
-      </body>
+      </div>
     </Provider>
   );
 }

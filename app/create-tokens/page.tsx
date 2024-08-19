@@ -7,7 +7,9 @@ import { useAppSelector } from "../store/hooks";
 import { nextStep, prevStep } from "../store/slice/createToken";
 
 export default function CreateTokens() {
-  const { formStep } = useAppSelector((state) => state.createToken);
+  const { formStep, tokenDetails } = useAppSelector(
+    (state) => state.createToken
+  );
 
   return (
     <section className="flex max-md:px-8 max-sm:px-6 max-xs:px-4 px-10 py-6 ">
@@ -21,11 +23,13 @@ export default function CreateTokens() {
             formStep={formStep}
             nextStep={nextStep}
             prevStep={prevStep}
+            tokenDetails={tokenDetails}
           />
           <DeployForm
             formStep={formStep}
             nextStep={nextStep}
             prevStep={prevStep}
+            tokenDetails={tokenDetails}
           />
           <AddLiquidityForm formStep={formStep} />
         </div>
