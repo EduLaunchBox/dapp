@@ -3,25 +3,36 @@ import { Button } from "@/app/components/buttons";
 import FormContainer from "@/app/components/formContainer";
 import { Input, ImageInput } from "@/app/components/inputsBoxes";
 import { useAppDispatch } from "@/app/store/hooks";
+import { TokenDetails } from "@/app/types";
+import { ActionCreatorWithPayload } from "@reduxjs/toolkit";
 import { useState } from "react";
 
 export default function SocialsForm({
   formStep,
   nextStep,
   prevStep,
+  tokenDetails,
 }: {
   formStep: number;
-  nextStep: any;
+  nextStep: ActionCreatorWithPayload<TokenDetails, any>;
   prevStep: any;
+  tokenDetails: TokenDetails;
 }) {
+  const [logo, setLogo] = useState<any>();
   const [twitterUrl, setTwitterUrl] = useState("");
+  const [errMsg, setErrMsg] = useState("");
   const dispatch = useAppDispatch();
 
   const handleNext = (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     event.preventDefault();
-    dispatch(nextStep());
+    // Verifications
+    if (!logo) setErrMsg("Please add a logo for your token");
+    if (!twitterUrl) setErrMsg("Please provide an X(formerly Twitter) url.");
+    if (errMsg) return;
+
+    dispatch(nextStep({ ...tokenDetails, xUrl: twitterUrl, logo }));
   };
 
   const handlePrev = (
@@ -37,7 +48,11 @@ export default function SocialsForm({
       className="flex w-full max-sm:p-4 p-6 flex-col gap-4"
       currentState={formStep}
     >
-      <ImageInput labelText={"Token Logo"} id={"tokenName"} />
+      <ImageInput
+        setImage={setLogo}
+        labelText={"Token Logo"}
+        id={`tokenName-${formStep}`}
+      />
 
       <Input
         labelName={"Project Twitter URL"}
