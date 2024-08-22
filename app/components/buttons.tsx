@@ -1,5 +1,6 @@
 import { MouseEventHandler } from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { ClipLoader } from "react-spinners";
 
 export function Button({
   arrow,
@@ -7,29 +8,41 @@ export function Button({
   color,
   onclick,
   className,
+  disabled,
+  loading,
 }: {
   arrow?: "forward" | "backward";
   text: string;
   color?: "white" | "green";
   onclick?: MouseEventHandler<HTMLButtonElement>;
   className?: string;
+  disabled?: boolean;
+  loading?: boolean;
 }) {
   return (
     <button
+      type="button"
+      disabled={disabled || loading}
       className={
         (color === "green"
-          ? "bg-secondary/700 text-grey/50 "
-          : " border-2 border-grey/200 text-grey/800 ") +
+          ? "bg-secondary/700 text-grey/50 disabled:bg-secondary/700/50 "
+          : " border-2 border-grey/200 disabled:border-grey/200/50 text-grey/800 disabled:text-grey/800/50 ") +
         " flex justify-center w-full max-md:text-[0.875rem] p-2 rounded-lg font-semibold " +
         className
       }
       onClick={onclick}
     >
-      <div className="flex max-md:gap-1.5 gap-2 mx-auto">
-        {arrow === "backward" && <FaChevronLeft className="flex my-auto" />}
-        <span className="flex my-auto">{text}</span>
-        {arrow === "forward" && <FaChevronRight className="flex my-auto" />}
-      </div>
+      {loading ? (
+        <ClipLoader size={"1.2rem"} />
+      ) : (
+        <>
+          <div className="flex max-md:gap-1.5 gap-2 mx-auto">
+            {arrow === "backward" && <FaChevronLeft className="flex my-auto" />}
+            <span className="flex my-auto">{text}</span>
+            {arrow === "forward" && <FaChevronRight className="flex my-auto" />}
+          </div>
+        </>
+      )}
     </button>
   );
 }

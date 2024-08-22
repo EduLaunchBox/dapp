@@ -30,6 +30,7 @@ export default function DeployForm({
   const dispatch = useAppDispatch();
   const [tokenDeployed, setTokenDeployed] = useState(false);
   const [tokenData, setTokenData] = useState(tokenDetails);
+  const [buttonLoading, setButtonloading] = useState(false);
   const { address } = useAccount();
 
   const handleNext = (
@@ -50,7 +51,8 @@ export default function DeployForm({
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     event.preventDefault();
-    let tokenDataCopy = { ...tokenData }; // Copy for use within this function
+    setButtonloading(true);
+    let tokenDataCopy = { ...tokenDetails }; // Copy for use within this function
 
     // Prompt user to connect wallet.
     if (!address) {
@@ -69,7 +71,7 @@ export default function DeployForm({
       });
 
       const data = await res.json();
-      tokenDataCopy = { ...tokenData, logoUrl: data.url };
+      tokenDataCopy = { ...tokenDetails, logoUrl: data.url };
     } catch (error) {
       console.error("Error uploading file:", error);
       return;
@@ -86,9 +88,11 @@ export default function DeployForm({
       );
 
       // Contract parameters
-      const name = tokenData.tokenName;
-      const symbol = tokenData.tokenSymbol;
-      const tokenSupply = ethers.parseEther(tokenData.tokenSupply.toString());
+      const name = tokenDetails.tokenName;
+      const symbol = tokenDetails.tokenSymbol;
+      const tokenSupply = ethers.parseEther(
+        tokenDetails.tokenSupply.toLocaleString().replaceAll(",", "")
+      );
 
       // Get Contract address
       const salt = await contract.getdeployedLaunchBoxesLen(address);
@@ -100,6 +104,7 @@ export default function DeployForm({
       await contract.newLaunchBox(name, symbol, tokenSupply);
       setTokenData(tokenDataCopy);
       setTokenDeployed(true);
+      console.log(tokenDataCopy);
     } catch (error) {
       console.error("Error deploying contract:", error);
       return;
@@ -118,14 +123,19 @@ export default function DeployForm({
           logo: null,
           network: "Etherium",
           deployer: address,
+          totalSupply: tokenDetails.tokenSupply
+            .toLocaleString()
+            .replaceAll(",", ""),
         }),
       });
 
       const data = await res.json();
       console.log(data);
+      setButtonloading(false);
     } catch (error) {
       // TODO: Might provide another way for them to add the details ti the database in the error
       console.error("Error saving data to db:", error);
+      setButtonloading(false);
       return;
     }
   };
@@ -176,7 +186,9 @@ export default function DeployForm({
             <DetailRow title="Token Symbol" value={tokenDetails?.tokenSymbol} />
             <DetailRow
               title="Token Supply"
-              value={`${tokenDetails?.tokenSupply} ${tokenDetails?.tokenSymbol}`}
+              value={`${tokenDetails?.tokenSupply
+                ?.toLocaleString()
+                .replaceAll(",", "")} ${tokenDetails?.tokenSymbol}`}
             />
             <DetailRow
               title="Network"

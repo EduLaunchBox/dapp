@@ -10,11 +10,11 @@ export default function App({ children }: { children: React.ReactNode }) {
     <Provider store={store}>
       <div
         className={
-          "font-cabinet_grotesk relative text-grey/700 flex w-full h-full"
+          "font-cabinet_grotesk relative text-grey/700 flex w-full h-screen"
         }
       >
         <SideNav />
-        <div className="flex flex-col w-full bg-primary/50">
+        <div className="flex flex-col w-full bg-primary/50 overflow-y-auto">
           <NavBar />
           <div>{children}</div>
         </div>

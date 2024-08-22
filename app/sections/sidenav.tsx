@@ -81,9 +81,8 @@ export default function SideNav() {
   return (
     <section
       className={
-        (isMenuOpen
-          ? " flex max-lg:fixed max-lg:left-0 max-lg:top-0 max-lg:z-50 max-lg:bg-grey/50 "
-          : " hidden ") + " min-h-screen"
+        (isMenuOpen ? " flex  " : " max-lg:hidden flex") +
+        " max-lg:fixed max-lg:left-0 max-lg:top-0 max-lg:z-50 max-lg:bg-grey/50 max-h-screen min-h-screen"
       }
     >
       {/* Opened Menu */}
@@ -129,7 +128,7 @@ export default function SideNav() {
           />
           <NavItem
             active={pathname.includes("/dev")}
-            href="/dev"
+            href="https://pauloladimeji.notion.site/EduLaunchBox-Docs-b887dad6ef0e4fa185d6f799a2e77001?pvs=4"
             text="dev"
             logo={CodeSvg}
           />

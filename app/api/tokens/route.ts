@@ -1,7 +1,5 @@
-import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { prisma } from "@/app/lib/prisma";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: Request) {
   try {
@@ -69,8 +67,34 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error("Error:", error);
     return NextResponse.json(
-      { error: "Failed to upload image" },
+      { error: "Failed to create token" },
       { status: 500 }
     );
+  }
+}
+
+export async function GET(request: NextRequest) {
+  try {
+    const url = new URL(request.url);
+    const tokenAddress = url.searchParams.get("tokenAddress");
+    if (!tokenAddress)
+      return NextResponse.json(
+        { error: "No token Address Passed" },
+        { status: 400 }
+      );
+
+    // Get token
+    let token = await prisma.token.findFirst({
+      where: {
+        contract: tokenAddress,
+      },
+    });
+    return NextResponse.json(
+      { message: "Token gotten successfully", data: token },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Error:", error);
+    return NextResponse.json({ error: "Failed to get token" }, { status: 500 });
   }
 }

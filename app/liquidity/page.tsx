@@ -89,7 +89,12 @@ export default function Liquidity() {
         </td>
         <td className="flex my-auto max-lg:min-w-[6rem] min-w-[8rem]">
           <Link
-            href={"/liquidity/add-liquidity"}
+            href={{
+              pathname: "/liquidity/add-liquidity",
+              query: {
+                tokenAddress: "0xd112D88BaD1556bcD5B55cBA596eBA80d55860c9",
+              },
+            }}
             className="flex w-full my-auto "
           >
             <Button
@@ -126,7 +131,7 @@ export default function Liquidity() {
                 <tr className="flex gap-4 w-full">
                   <th className="flex max-lg:text-[0.875rem] min-w-[10rem]">
                     <span className="flex font-medium text-grey/700 text-nowrap">
-                      Token name + Symbol
+                      Token name
                     </span>
                   </th>
                   <th className="flex max-lg:min-w-[3rem] max-lg:text-[0.875rem] min-w-[4rem]">

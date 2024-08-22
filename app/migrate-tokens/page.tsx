@@ -32,6 +32,7 @@ export default function MigrateTokens() {
           <VerifyTokenDetailsForm
             formStep={formStep}
             verificationStep={verificationStep}
+            verificationNext={verificationNext}
             nextStep={nextStep}
             prevStep={verificationPrev}
             tokenDetails={tokenDetails}
@@ -48,7 +49,10 @@ export default function MigrateTokens() {
             prevStep={prevStep}
             tokenDetails={tokenDetails}
           />
-          <AddLiquidityForm formStep={formStep} />
+          <AddLiquidityForm
+            formStep={formStep}
+            tokenAddress={tokenDetails?.contract}
+          />
         </div>
       </div>
     </section>

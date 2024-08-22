@@ -13,4 +13,21 @@ export type TokenDetails = {
   contract?: Address;
   points?: number;
   logo?: any;
+  holders?: number;
+};
+
+// When gotten from database
+export type TokenType = {
+  id: string;
+  name: string;
+  symbol: string;
+  totalSupply: string;
+  decimal: number;
+  logoUrl: string;
+  xUrl: string;
+  categoryId: number;
+  networkId: number;
+  deployerId: Address;
+  contract: Address;
+  points: number;
 };

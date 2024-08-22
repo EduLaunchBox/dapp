@@ -3,16 +3,175 @@ import { Button, ToggleButton } from "@/app/components/buttons";
 import FormContainer from "@/app/components/formContainer";
 import { SelectInput } from "@/app/components/inputsBoxes";
 import Image from "next/image";
-import { useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { AiOutlineInfoCircle } from "react-icons/ai";
 import eduLogo from "../../assets/images/edu.png";
 import uniLogo from "../../assets/images/uni.png";
 import { PiPlus } from "react-icons/pi";
 import { TwoStepBar } from "@/app/components/progressBar";
+import SailfishLogo from "../../assets/images/sailfish.png";
+import { useAccount, useBalance } from "wagmi";
+import { Address, isAddress, parseEther } from "viem";
+import { useSearchParams } from "next/navigation";
+import { ethers } from "ethers";
+import axios from "axios";
+import { TokenDetails, TokenType } from "@/app/types";
+import { ClipLoader } from "react-spinners";
+import { getEthersSigner } from "@/app/providers/ethers";
+import { config } from "@/app/providers/wagmi/config";
+import ERC20Abi from "../../lib/abi/ERC20Abi.json";
+import VaultAbi from "../../lib/abi/vaultAbi.json";
+import SuccessfullyDeployed from "../popovers/successfullyDeployed";
 
-export default function AddLiquidityForm({ formStep }: { formStep: number }) {
-  const [dex, setDex] = useState("");
+const nativeToken = process.env.NEXT_PUBLIC_NATIVE_TOKEN as Address;
+const vaultContractAddress = process.env.NEXT_PUBLIC_VAULT_CONTRACT as Address;
+const sailfishApikey = process.env.NEXT_PUBLIC_SAILFISH_APIKEY as string;
+
+export default function AddLiquidityForm({
+  formStep,
+  tokenAddress,
+}: {
+  formStep: number;
+  tokenAddress?: Address;
+}) {
   const [toNotStake, setToNotStake] = useState(false);
+  const [baseAmount, setBaseAmount] = useState(0); // Amount of Edu(Native coin) being added as liquidity
+  const [qouteAmount, setQouteAmount] = useState(0); // Amount of users token the user is adding for liquidity
+  const [btnLoading, setBtnLoading] = useState(false);
+
+  const [quoteTokenAddress, setQuoteTokenAddress] = useState<Address>();
+  const searchParams = useSearchParams();
+  const [dex, setDex] = useState("");
+  const [showPopup, setShowPopup] = useState(true);
+
+  const [quoteToken, setQuoteToken] = useState<TokenType>();
+  const [tokenLoading, setTokenLoading] = useState<boolean>(true);
+  const [tokenApproved, setTokenApproved] = useState(false);
+  const [lpAdded, setLpAdded] = useState(false);
+
+  const { address } = useAccount();
+  const baseTokenBal = useBalance({
+    address: address,
+  });
+
+  const handleAddLp = async (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    event.preventDefault();
+    setBtnLoading(true);
+    const sailFishBaseURl = "https://app.sailfish.finance";
+
+    try {
+      const response = await fetch(quoteToken?.logoUrl || "");
+      const imageBlob = await response.blob();
+
+      const formData = new FormData();
+      formData.append("name", quoteToken?.name || "");
+      formData.append("address", quoteToken?.contract || "");
+      formData.append("created_at", new Date().toISOString());
+      formData.append("logo", imageBlob, "image.jpg");
+
+      const { data } = await axios.post(
+        sailFishBaseURl + "/api/tokens",
+        formData,
+        { headers: { "x-api-key": sailfishApikey } }
+      );
+      console.log(data);
+      setShowPopup(true);
+      setLpAdded(true);
+      setBtnLoading(false);
+    } catch (error: any) {
+      console.log(error);
+      alert("Something went wrong. Check console for details");
+      setBtnLoading(false);
+    }
+  };
+
+  const handleApprove = async (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    try {
+      event.preventDefault();
+      setBtnLoading(true);
+      if (!baseAmount || !qouteAmount) {
+        alert("Please add an amount");
+        return;
+      }
+
+      // Define the contract configuration
+      const signer = await getEthersSigner(config);
+      const uniContract = new ethers.Contract(
+        quoteTokenAddress as Address,
+        ERC20Abi,
+        signer
+      );
+      const vaultContract = new ethers.Contract(
+        vaultContractAddress,
+        VaultAbi,
+        signer
+      );
+
+      const amountAIn = ethers.parseEther(baseAmount.toString()); //EDU
+      const amountBIn = ethers.parseEther(qouteAmount.toString()); //UNI
+      await uniContract.approve(vaultContractAddress, amountBIn); //Let Vault spend UNI
+
+      const res = await vaultContract.addLiquidity(
+        nativeToken,
+        quoteTokenAddress,
+        false,
+        amountAIn,
+        amountBIn,
+        0,
+        0,
+        address, //msg.sender
+        ethers.MaxUint256,
+        {
+          value: amountAIn,
+        }
+      );
+      setTokenApproved(true);
+      setBtnLoading(false);
+      console.log(res);
+    } catch (error) {
+      if (String(error).includes('reverted: "duplicated token"')) {
+        setTokenApproved(true);
+        setBtnLoading(false);
+        return;
+      }
+      console.log(error);
+    }
+  };
+
+  // Get token details from db if tokenAddress
+  useEffect(() => {
+    if (quoteTokenAddress)
+      (async () => {
+        try {
+          setTokenLoading(true);
+          const { data } = await axios.get(
+            "/api/tokens?tokenAddress=" + quoteTokenAddress
+          );
+          setQuoteToken(data.data);
+          setTokenLoading(false);
+        } catch (error) {
+          console.log(error);
+          alert("Something went wrong. Check console");
+        }
+      })();
+  }, [quoteTokenAddress]);
+
+  useEffect(() => {
+    if (tokenAddress) {
+      setQuoteTokenAddress(tokenAddress);
+      return;
+    }
+
+    const tempAddress = searchParams.get("tokenAddress");
+    if (tempAddress && isAddress(tempAddress)) {
+      setQuoteTokenAddress(tempAddress as Address);
+      return;
+    }
+  }, [searchParams, tokenAddress]);
 
   return (
     <FormContainer
@@ -46,29 +205,62 @@ export default function AddLiquidityForm({ formStep }: { formStep: number }) {
           id={"addLiquidity"}
           setValue={setDex}
         >
-          <option>Sailfish</option>
+          <option value={"Sailfish"} className="flex gap-2 p-1 text-grey/800">
+            Sailfish
+          </option>
         </SelectInput>
 
-        <div className="flex flex-col gap-2">
-          <span className="flex font-medium text-grey/700 max-sm:text-[0.875rem]">
-            Quote Token
-          </span>
-          <TokenInput logo={eduLogo} symbol={"EDU"} balance={"10,685.83"} />
-        </div>
+        {tokenLoading ? (
+          <div className="flex w-full h-40 justify-center">
+            <ClipLoader className="my-auto" color="#254AD0" size={"2.5rem"} />
+          </div>
+        ) : (
+          <>
+            <div className="flex flex-col gap-2">
+              <span className="flex font-medium text-grey/700 max-sm:text-[0.875rem]">
+                Quote Token
+              </span>
+              <TokenInput
+                setValue={setQouteAmount}
+                logo={quoteToken?.logoUrl || uniLogo}
+                symbol={quoteToken?.symbol || "Nil"}
+                balance={quoteToken?.totalSupply || "0.00"}
+              />
+            </div>
 
-        <div className="flex w-full">
-          <PiPlus className="flex mx-auto" />
-        </div>
+            <div className="flex w-full">
+              <PiPlus className="flex mx-auto" />
+            </div>
 
-        <div className="flex flex-col gap-2">
-          <span className="flex font-medium text-grey/700 max-sm:text-[0.875rem]">
-            Base Token
-          </span>
-          <TokenInput logo={uniLogo} symbol={"UNI"} balance={"10,685.83"} />
-        </div>
+            <div className="flex flex-col gap-2">
+              <span className="flex font-medium text-grey/700 max-sm:text-[0.875rem]">
+                Base Token
+              </span>
+              <TokenInput
+                setValue={setBaseAmount}
+                logo={eduLogo}
+                symbol={baseTokenBal?.data?.symbol || "EDU"}
+                balance={
+                  ((Number(baseTokenBal?.data?.value) || 0) / 10 ** 18).toFixed(
+                    4
+                  ) || "0.00"
+                }
+              />
+            </div>
+          </>
+        )}
 
-        <div className="flex w-full pt-2">
-          <PriceAndPool quoteSymbol={"EDU"} baseSymbol={"UNI"} />
+        <div
+          className={
+            (!qouteAmount || !baseAmount ? "hidden" : "flex") + " w-full pt-2"
+          }
+        >
+          <PriceAndPool
+            quoteSymbol={quoteToken?.symbol || "Nil"}
+            baseAmount={baseAmount}
+            quoteAmount={qouteAmount}
+            baseSymbol={baseTokenBal?.data?.symbol || "EDU"}
+          />
         </div>
 
         <div className="flex w-full">
@@ -95,20 +287,49 @@ export default function AddLiquidityForm({ formStep }: { formStep: number }) {
           <TwoStepBar
             stepOne={{
               name: "Approve Token",
-              status: !toNotStake ? "doing" : "done",
+              status: !tokenApproved ? "doing" : "done",
             }}
             stepTwo={{
               name: "Add LP",
-              status: !toNotStake ? "undone" : "doing",
+              status: !tokenApproved ? "undone" : "doing",
             }}
           />
         </div>
       </div>
 
       <div className="flex flex-col justify-between gap-2">
-        <Button text={"Approve UNI"} color="green" />
-        <Button text={"Skip"} className="border-none" />
+        {qouteAmount > Number(quoteToken?.totalSupply) ||
+        parseEther(String(baseAmount)) >
+          Number(baseTokenBal.data?.value || "0") ? (
+          <Button disabled text={"Insufficient Funds"} color="green" />
+        ) : tokenApproved ? (
+          <Button
+            onclick={handleAddLp}
+            text={"Add LP"}
+            color="green"
+            loading={btnLoading}
+          />
+        ) : (
+          <Button
+            onclick={handleApprove}
+            text={"Approve " + (baseTokenBal?.data?.symbol || "EDU")}
+            color="green"
+            loading={btnLoading}
+          />
+        )}
+        <Button
+          onclick={() => setShowPopup(true)}
+          text={"Skip"}
+          className="border-none"
+        />
       </div>
+      <SuccessfullyDeployed
+        type={
+          searchParams.get("tokenAddress") ? "lp" : lpAdded ? "both" : "token"
+        }
+        show={showPopup}
+        setShow={setShowPopup}
+      />
     </FormContainer>
   );
 }
@@ -116,9 +337,13 @@ export default function AddLiquidityForm({ formStep }: { formStep: number }) {
 const PriceAndPool = ({
   quoteSymbol,
   baseSymbol,
+  quoteAmount,
+  baseAmount,
 }: {
   quoteSymbol: string;
   baseSymbol: string;
+  quoteAmount: number;
+  baseAmount: number;
 }) => {
   return (
     <div className="flex w-full flex-col rounded-3xl border bg-grey/70 border-primary/100">
@@ -129,13 +354,17 @@ const PriceAndPool = ({
       </div>
       <div className="flex justify-around max-sm:text-[0.875rem] py-4">
         <div className="flex flex-col">
-          <span className="flex mx-auto text-grey/900 font-bold">2,038</span>
+          <span className="flex mx-auto text-grey/900 font-bold">
+            {(quoteAmount / baseAmount).toFixed(4)}
+          </span>
           <span className="flex text-grey/500 font-bold">
             {quoteSymbol} per {baseSymbol}
           </span>
         </div>
         <div className="flex flex-col">
-          <span className="flex mx-auto text-grey/900 font-bold">0.0027</span>
+          <span className="flex mx-auto text-grey/900 font-bold">
+            {(baseAmount / quoteAmount).toFixed(4)}
+          </span>
           <span className="flex text-grey/500 font-bold">
             {baseSymbol} per {quoteSymbol}
           </span>
@@ -153,21 +382,27 @@ const TokenInput = ({
   logo,
   symbol,
   balance,
+  setValue,
 }: {
   logo: any;
   symbol: string;
   balance: string;
+  setValue: Dispatch<SetStateAction<number>>;
 }) => {
   return (
     <div className="flex flex-col w-full bg-grey/70 border border-grey/200 rounded-3xl px-3 py-2">
       <div className="flex w-full gap-2">
         <input
+          type={"number"}
+          onChange={(event) => setValue(Number(event.target.value))}
           className="flex w-full bg-transparent border-none leading-none outline-none max-sm:text-[1.5rem] text-[2rem] font-medium placeholder-grey/400"
           placeholder="0.00"
         />
         <button className="flex h-fit py-[0.2rem] rounded-full border border-grey/200 bg-grey/100-alt my-auto">
           <Image
             className="flex w-6 h-6 rounded-full object-fit my-auto m-[0.2rem]"
+            width={500}
+            height={500}
             src={logo}
             alt={symbol}
           />

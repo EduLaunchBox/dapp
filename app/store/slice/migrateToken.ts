@@ -1,10 +1,12 @@
 "use client";
 import { TokenDetails } from "@/app/types";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { Address } from "viem";
 
 export interface MigrateTokenState {
   formStep: number;
   verificationStep: number;
+  verified: boolean;
   tokenDetails: TokenDetails;
 }
 
@@ -24,7 +26,9 @@ const initialState: MigrateTokenState = {
     contract: undefined,
     points: undefined,
     logo: undefined,
+    holders: undefined,
   },
+  verified: false,
 };
 
 export const migrateTokenSlice = createSlice({
@@ -38,7 +42,9 @@ export const migrateTokenSlice = createSlice({
     prevStep: (state) => {
       state.formStep -= 1;
     },
-    verificationNext: (state) => {
+    verificationNext: (state, action: PayloadAction<Address>) => {
+      state.tokenDetails = { ...state.tokenDetails, contract: action.payload };
+      state.verified = true;
       state.verificationStep += 1;
     },
     verificationPrev: (state) => {
