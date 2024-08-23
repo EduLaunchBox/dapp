@@ -8,6 +8,8 @@ import polygonLogo from "./assets/images/polygon.png";
 import Image from "next/image";
 import { BsArrowDown } from "react-icons/bs";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import Markdown from "react-markdown";
 
 export default function Home() {
   const router = useRouter();
@@ -65,7 +67,12 @@ export default function Home() {
     live?: boolean;
   }) => {
     return (
-      <div className="flex text-grey/800 max-xs:max-w-full max-xs:min-w-full max-lg:max-w-[14rem] max-w-[15rem] flex-col gap-2 p-3 rounded-xl bg-grey/50 drop-shadow">
+      <button
+        onClick={() => {
+          if (live) router.push("/migrate-tokens");
+        }}
+        className="flex text-grey/800 max-xs:max-w-full max-xs:min-w-full max-lg:max-w-[14rem] max-w-[15rem] flex-col gap-2 p-3 rounded-xl bg-grey/50 drop-shadow"
+      >
         <div className="flex justify-between w-full">
           <div className="flex gap-2">
             <Image
@@ -93,19 +100,39 @@ export default function Home() {
         <span className="flex w-56 max-lg:text-[0.75rem] text-[0.875rem]">
           Migrate your token, holders and liquidity from {chain}
         </span>
-      </div>
+      </button>
     );
   };
 
-  const FAQDropdown = ({ question }: { question: string }) => {
+  const FAQDropdown = ({
+    question,
+    answer,
+  }: {
+    question: string;
+    answer: string;
+  }) => {
+    const [showAnswer, setShowAnswer] = useState(false);
     return (
       <div className="flex max-w-[61.5rem] flex-col ">
-        <button className="flex w-full justify-between bg-grey/50 py-3 max-sm:px-2 max-sm:py-1.5 max-sm:text-[0.875rem] px-4 border border-grey/200 text-[1rem] rounded-lg ">
+        <button
+          onClick={() => setShowAnswer(!showAnswer)}
+          className="flex w-full justify-between bg-grey/50 py-3 max-sm:px-2 max-sm:py-1.5 max-sm:text-[0.875rem] px-4 border border-grey/200 text-[1rem] rounded-lg "
+        >
           <span className="font-medium flex my-auto">{question}</span>
           <span className="flex my-auto">
             <BsArrowDown />
           </span>
         </button>
+        <div
+          className={
+            (showAnswer ? "flex h-full " : "hidden h-0 ") +
+            " transition-[height] duration-500 w-full justify-between bg-grey/50 py-3 max-sm:px-2 max-sm:py-1.5 max-sm:text-[0.875rem] px-4 border border-grey/200 text-[1rem] rounded-lg "
+          }
+        >
+          <span>
+            <Markdown>{answer}</Markdown>
+          </span>
+        </div>
       </div>
     );
   };
@@ -155,10 +182,49 @@ export default function Home() {
           </span>
         </div>
         <div className="flex flex-col max-sm:gap-1 gap-2 max-h-[20rem] overflow-y-auto">
-          <FAQDropdown question="What is EDU lauanchbox?" />
-          <FAQDropdown question="Why should I use EDUlaunchBox" />
-          <FAQDropdown question="What are the Fees?" />
-          <FAQDropdown question="My Chain is not supported yet" />
+          {[
+            {
+              question: "What is EduLaunchBox?",
+              answer:
+                "EduLaunchBox is a comprehensive platform built on the OpenEdu blockchain that enables developers to create, migrate, and launch tokens, as well as bootstrap liquidity for their dApps. It simplifies the process of onboarding projects onto EduChain, making it accessible to developers of all skill levels.",
+            },
+            {
+              question: "Why was EduLaunchBox created?",
+              answer:
+                "EduLaunchBox was created to address the challenges faced by developers and educational institutions in adopting blockchain technology. The platform aims to lower the barriers to entry, allowing anyone to seamlessly integrate with EduChain and leverage the benefits of a decentralized educational ecosystem. This initiative supports the broader vision of OpenEdu by making education more accessible, transparent, and equitable.",
+            },
+            {
+              question: "What are the key features of EduLaunchBox?",
+              answer:
+                "- **Token Creation:** Effortlessly create new tokens on EduChain with customizable parameters.\n- **Token Migration:** Migrate existing tokens and token holders from other EVM-compatible chains to EduChain.\n- **Instant Liquidity Deployment:** Quickly deploy liquidity for token pairs via SailFish, the first veDEX on EduChain.\n- **Points API (coming soon):** Earn and redistribute points by linking dApps to tokens, incentivizing onchain activity and user engagement.",
+            },
+            {
+              question: "How do I create a new token using EduLaunchBox?",
+              answer:
+                "To create a new token using EduLaunchBox:\n\n- Visit EduLaunchBox, and on the homepage, click on 'Create token & liquidity.'\n- Enter the token's basic details, including the name, symbol, total supply, and decimals.\n- Submit your project's logo and Twitter URL for branding and verification.\n- Review the details carefully. Then, connect your wallet and sign the contract that assigns your wallet as the token creator.\n- Deploy the token on EduChain. The entire process typically takes less than 5 minutes. You’ll receive a confirmation notice once the token is deployed.\n\n**Adding liquidity**\n\n- After deployment, you have the option to add liquidity via SailFish. Your token will be paired against EDU, with EDU set as the quote token and your token as the base token.\n- When adding liquidity, you can also choose to stake LP (Liquidity Provider) tokens to facilitate swaps for your token.\n- Typically, the base token (your newly created token) and EDU (the quote token) are locked in these swaps.\n- LP tokens can be unstaked via SailFish at any time, allowing you to withdraw your liquidity and reclaim your tokens.\n- Note that unstaking reduces the liquidity of your token, and may affect its trading dynamics.",
+            },
+            {
+              question: "What type of token will I create with EduLaunchBox?",
+              answer:
+                "With EduLaunchBox, you'll create a non-mintable token, meaning the total supply is fixed and set by you during the token creation process. Beyond this, no additional tokens will be created after deployment.\n\nThe wallet you connected during deployment will be assigned as the token's owner, thereby giving you the ability to manage any future upgrades or updates to its tokenomics.\n\nThis setup ensures a balance of stability and flexibility. The supply is determined by you at the time of creation, preventing inflation and helping maintain your token’s value over time. It also ensures your token is secure, predictable, and well-suited for long-term projects.",
+            },
+            {
+              question: "Which blockchains are compatible with EduLaunchBox?",
+              answer:
+                "EduLaunchBox is designed to be compatible with EVM (Ethereum Virtual Machine) chains, enabling developers to easily migrate tokens and dApps from popular blockchains. Currently, Ethereum is supported, with upcoming support for Binance Smart Chain, Polygon, and others.",
+            },
+            {
+              question: "Can I migrate tokens from non-EVM chains to EduChain?",
+              answer:
+                "At present, EduLaunchBox primarily supports migration from EVM-compatible chains. Support for non-EVM chains is planned for the future and will be implemented based on demand.",
+            },
+          ].map((faq, index) => (
+            <FAQDropdown
+              key={index}
+              answer={faq.answer}
+              question={faq.question}
+            />
+          ))}
         </div>
       </div>
     </section>

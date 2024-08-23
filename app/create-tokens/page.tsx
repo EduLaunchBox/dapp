@@ -31,7 +31,10 @@ export default function CreateTokens() {
             prevStep={prevStep}
             tokenDetails={tokenDetails}
           />
-          <AddLiquidityForm formStep={formStep} />
+          <AddLiquidityForm
+            formStep={formStep}
+            tokenAddress={tokenDetails.contract}
+          />
         </div>
       </div>
     </section>

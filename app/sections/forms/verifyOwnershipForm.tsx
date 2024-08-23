@@ -2,8 +2,16 @@
 import { Button } from "@/app/components/buttons";
 import FormContainer from "@/app/components/formContainer";
 import { Input, SelectInput } from "@/app/components/inputsBoxes";
+import { getEthersSigner } from "@/app/providers/ethers";
+import { config } from "@/app/providers/wagmi/config";
 import { useAppDispatch } from "@/app/store/hooks";
+import { ActionCreatorWithPayload } from "@reduxjs/toolkit";
+import axios from "axios";
+import { ethers } from "ethers";
 import { useState } from "react";
+import { Address } from "viem";
+
+const basescanApikey = process.env.NEXT_PUBLIC_BASESCAN_APIKEY as string;
 
 export default function VerifyOwnershipForm({
   formStep,
@@ -12,19 +20,49 @@ export default function VerifyOwnershipForm({
 }: {
   formStep: number;
   verificationStep: number;
-  verificationNext: any;
+  verificationNext: ActionCreatorWithPayload<
+    `0x${string}`,
+    "migrateToken/verificationNext"
+  >;
 }) {
   const [network, setNetwork] = useState("");
   const [tokenType, setTokenType] = useState("");
   const [tokenContractAdd, setTokenContractAdd] = useState("");
+  const [btnLoading, setBtnLoading] = useState(false);
+
+  const ETHERSCAN_APIS = {
+    baseSepolia: `https://api-sepolia.basescan.org/api?module=contract&action=getcontractcreation&contractaddresses=${tokenContractAdd}&apikey=${basescanApikey}`,
+  };
 
   const dispatch = useAppDispatch();
 
-  const handleSign = (
+  const handleSign = async (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
-    event.preventDefault();
-    dispatch(verificationNext());
+    try {
+      event.preventDefault();
+      setBtnLoading(true);
+      const signer = await getEthersSigner(config);
+      const { data } = await axios.get(ETHERSCAN_APIS.baseSepolia); // Todo: make more flexible
+      const contractCreator = data?.result?.[0]?.contractCreator as string;
+
+      const message = `Verify that I am the creator of the token at address ${tokenContractAdd}`;
+      const signature = await signer.signMessage(message);
+
+      // Recover the address from the signature Compare the recovered address with the token creator's address
+      const recoveredAddress = ethers.verifyMessage(message, signature);
+      const isCreator =
+        recoveredAddress.toLowerCase() === contractCreator.toLowerCase();
+      if (isCreator) {
+        dispatch(verificationNext(tokenContractAdd as Address));
+      } else {
+        alert("This account did not deploy this token");
+      }
+      setBtnLoading(false);
+    } catch (error) {
+      console.log(error);
+      setBtnLoading(false);
+    }
   };
 
   return (
@@ -64,7 +102,7 @@ export default function VerifyOwnershipForm({
           labelName={"Network"}
           value={network}
         >
-          <option value={"Ethereum"}>Ethereum</option>
+          <option value={"Ethereum"}>Ethereum (Base Sepolia)</option>
         </SelectInput>
       </div>
 
@@ -74,6 +112,7 @@ export default function VerifyOwnershipForm({
           text={"Sign message"}
           color="green"
           arrow={"forward"}
+          loading={btnLoading}
         />
         <span className="flex mx-auto text-grey/700 text-[0.75rem] font-medium">
           Proves that you are the token deployer

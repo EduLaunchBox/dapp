@@ -54,7 +54,7 @@ export function SelectInput({
         }
       >
         <select
-          className="flex w-full bg-transparent outline-none p-2 text-grey/300"
+          className="flex w-full bg-transparent outline-none p-2 text-grey/800 font-semibold"
           id={id}
           value={value}
           onChange={(e) => setValue(e.target.value)}
@@ -96,6 +96,22 @@ export function Input({
 }) {
   const [isActive, setIsActive] = useState<boolean>(false);
   const [isHoveredOver, setIsHoveredOver] = useState<boolean>(false);
+
+  const handlePasteClick = async () => {
+    try {
+      // Check if the clipboard API is available
+      if (navigator.clipboard && navigator.clipboard.readText) {
+        // Read text from the clipboard
+        const text = await navigator.clipboard.readText();
+        // Update the input value with the pasted text
+        setValue(text);
+      } else {
+        alert("Clipboard API not supported in this browser");
+      }
+    } catch (err) {
+      console.error("Failed to read clipboard contents:", err);
+    }
+  };
 
   return (
     <div className={(className ? className : "") + " flex flex-col gap-2"}>
@@ -139,7 +155,11 @@ export function Input({
 
         {/* Checks the type to display appropriate surfix */}
         {type === "paste" && (
-          <button className="flex gap-2 bg-secondary/700 rounded-md m-[0.3rem] py-[0.2rem] px-4">
+          <button
+            onClick={handlePasteClick}
+            type={"button"}
+            className="flex gap-2 bg-secondary/700 rounded-md m-[0.3rem] py-[0.2rem] px-4"
+          >
             <span className="flex my-auto">
               <FaPaste color="#fff" size={"1rem"} />
             </span>

@@ -3,12 +3,18 @@ import Image from "next/image";
 import { FiCopy } from "react-icons/fi";
 import { MdOutlineNorthEast } from "react-icons/md";
 import deployedPng from "../../assets/images/deployed.png";
+import { Dispatch, SetStateAction, useState } from "react";
 
 export default function SuccessfullyDeployed({
   type,
+  show,
+  setShow,
 }: {
   type: "token" | "lp" | "both";
+  show: boolean;
+  setShow: Dispatch<SetStateAction<boolean>>;
 }) {
+  const [canDisable, setCanDisable] = useState(false);
   const ContractAddress = ({
     type,
     address,
@@ -38,9 +44,22 @@ export default function SuccessfullyDeployed({
       </div>
     );
   };
+
   return (
-    <div className="fixed top-0 left-0 h-screen w-screen flex bg-black/20 justify-center overflow-none overscroll-none">
-      <div className="flex my-auto bg-white z-10 flex-col gap-6 p-4 rounded-2xl">
+    <div
+      onClick={() => {
+        if (canDisable) setShow(false);
+      }}
+      className={
+        (show ? "flex" : "hidden") +
+        " fixed top-0 left-0 h-screen w-screen flex bg-black/20 justify-center overflow-none overscroll-none"
+      }
+    >
+      <div
+        onMouseEnter={() => setCanDisable(false)}
+        onMouseLeave={() => setCanDisable(true)}
+        className="flex my-auto bg-white z-10 flex-col gap-6 p-4 rounded-2xl"
+      >
         <div className="flex justify-center bg-primary/50 border border-primary/100 rounded-xl w-full h-52">
           <Image
             className="flex w-3/5 h-3/5 object-fit mx-auto my-auto"
@@ -84,7 +103,7 @@ export default function SuccessfullyDeployed({
         </div>
 
         <div>
-          <Button text="Close" />
+          <Button onclick={() => setShow(false)} text="Close" />
         </div>
       </div>
     </div>

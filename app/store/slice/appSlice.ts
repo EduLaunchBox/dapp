@@ -6,7 +6,7 @@ export interface GeneralAppState {
 }
 
 const initialState: GeneralAppState = {
-  isMenuOpen: true,
+  isMenuOpen: false,
 };
 
 export const generalAppSlice = createSlice({

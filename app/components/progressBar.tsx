@@ -59,7 +59,7 @@ export function TwoStepBar({
       >
         <span
           className={
-            (stepTwo.status === "undone" ? "w-0 " : "w-full ") +
+            (stepOne.status === "done" ? "w-full " : "w-0 ") +
             " flex h-full transition[width] ease-in-out duration-200 bg-secondary/700"
           }
         ></span>
