@@ -9,6 +9,7 @@ import { ActionCreatorWithPayload } from "@reduxjs/toolkit";
 import axios from "axios";
 import { ethers } from "ethers";
 import { useState } from "react";
+import Swal from "sweetalert2";
 import { Address } from "viem";
 
 const basescanApikey = process.env.NEXT_PUBLIC_BASESCAN_APIKEY as string;
@@ -42,6 +43,16 @@ export default function VerifyOwnershipForm({
     try {
       event.preventDefault();
       setBtnLoading(true);
+      if (!tokenContractAdd) {
+        Swal.fire({
+          title: "Error!!",
+          text: "Please add a token address",
+          icon: "error",
+          cancelButtonText: "Okay",
+        }).finally(() => setBtnLoading(false));
+        return;
+      }
+
       const signer = await getEthersSigner(config);
       const { data } = await axios.get(ETHERSCAN_APIS.baseSepolia); // Todo: make more flexible
       const contractCreator = data?.result?.[0]?.contractCreator as string;
@@ -56,12 +67,20 @@ export default function VerifyOwnershipForm({
       if (isCreator) {
         dispatch(verificationNext(tokenContractAdd as Address));
       } else {
-        alert("This account did not deploy this token");
+        Swal.fire({
+          text: "This account did not deploy this token",
+          icon: "info",
+          cancelButtonText: "Okay",
+        });
       }
       setBtnLoading(false);
     } catch (error) {
-      console.log(error);
-      setBtnLoading(false);
+      Swal.fire({
+        title: "Error!!",
+        text: "Something went wrong",
+        icon: "error",
+        cancelButtonText: "Okay",
+      }).finally(() => setBtnLoading(false));
     }
   };
 
@@ -102,7 +121,7 @@ export default function VerifyOwnershipForm({
           labelName={"Network"}
           value={network}
         >
-          <option value={"Ethereum"}>Ethereum (Base Sepolia)</option>
+          <option value={"Ethereum"}>Base Sepolia</option>
         </SelectInput>
       </div>
 

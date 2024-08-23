@@ -19,15 +19,16 @@ export async function POST(request: Request) {
     // Get or create network
     let network = await prisma.network.findFirst({
       where: {
-        name: data.network,
-        chainId: 1,
+        name: data.network?.name,
       },
     });
     if (!network)
       network = await prisma.network.create({
         data: {
-          name: data.network,
-          chainId: 1,
+          name: data.network?.name,
+          chainId: data?.network?.chainId || null,
+          explorerUrl: data?.network?.explorerUrl || null,
+          logoUrl: data?.network?.logoUrl || null,
         },
       });
 

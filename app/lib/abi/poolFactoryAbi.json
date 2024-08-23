@@ -1,0 +1,108 @@
+[
+    {
+        "type": "constructor",
+        "inputs": [{ "name": "vault_", "type": "address", "internalType": "contract IVault" }],
+        "stateMutability": "nonpayable"
+    },
+    {
+        "type": "function",
+        "name": "deploy",
+        "inputs": [
+            { "name": "quoteToken", "type": "bytes32", "internalType": "Token" },
+            { "name": "baseToken", "type": "bytes32", "internalType": "Token" }
+        ],
+        "outputs": [{ "name": "", "type": "address", "internalType": "contract XYKPool" }],
+        "stateMutability": "nonpayable"
+    },
+    {
+        "type": "function",
+        "name": "getPools",
+        "inputs": [
+            { "name": "begin", "type": "uint256", "internalType": "uint256" },
+            { "name": "maxLength", "type": "uint256", "internalType": "uint256" }
+        ],
+        "outputs": [{ "name": "pools", "type": "address[]", "internalType": "contract XYKPool[]" }],
+        "stateMutability": "view"
+    },
+    {
+        "type": "function",
+        "name": "isPool",
+        "inputs": [{ "name": "", "type": "address", "internalType": "contract XYKPool" }],
+        "outputs": [{ "name": "", "type": "bool", "internalType": "bool" }],
+        "stateMutability": "view"
+    },
+    {
+        "type": "function",
+        "name": "poolList",
+        "inputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
+        "outputs": [{ "name": "", "type": "address", "internalType": "contract XYKPool" }],
+        "stateMutability": "view"
+    },
+    {
+        "type": "function",
+        "name": "pools",
+        "inputs": [
+            { "name": "", "type": "bytes32", "internalType": "Token" },
+            { "name": "", "type": "bytes32", "internalType": "Token" }
+        ],
+        "outputs": [{ "name": "", "type": "address", "internalType": "contract XYKPool" }],
+        "stateMutability": "view"
+    },
+    {
+        "type": "function",
+        "name": "poolsLength",
+        "inputs": [],
+        "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
+        "stateMutability": "view"
+    },
+    {
+        "type": "function",
+        "name": "setDecay",
+        "inputs": [{ "name": "decay_", "type": "uint32", "internalType": "uint32" }],
+        "outputs": [],
+        "stateMutability": "nonpayable"
+    },
+    {
+        "type": "function",
+        "name": "setFee",
+        "inputs": [{ "name": "fee1e9_", "type": "uint32", "internalType": "uint32" }],
+        "outputs": [],
+        "stateMutability": "nonpayable"
+    },
+    {
+        "type": "event",
+        "name": "DecayChanged",
+        "inputs": [
+            { "name": "decay", "type": "uint256", "indexed": false, "internalType": "uint256" }
+        ],
+        "anonymous": false
+    },
+    {
+        "type": "event",
+        "name": "FeeChanged",
+        "inputs": [
+            {
+                "name": "fee1e18",
+                "type": "uint256",
+                "indexed": false,
+                "internalType": "uint256"
+            }
+        ],
+        "anonymous": false
+    },
+    {
+        "type": "event",
+        "name": "PoolCreated",
+        "inputs": [
+            {
+                "name": "pool",
+                "type": "address",
+                "indexed": true,
+                "internalType": "contract XYKPool"
+            },
+            { "name": "t1", "type": "bytes32", "indexed": false, "internalType": "Token" },
+            { "name": "t2", "type": "bytes32", "indexed": false, "internalType": "Token" }
+        ],
+        "anonymous": false
+    }
+]

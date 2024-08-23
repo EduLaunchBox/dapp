@@ -8,7 +8,7 @@ export type TokenDetails = {
   decimal: number;
   xUrl?: string;
   logoUrl?: string;
-  network?: string;
+  network?: NetworkType;
   deployer?: Address;
   contract?: Address;
   points?: number;
@@ -26,8 +26,16 @@ export type TokenType = {
   logoUrl: string;
   xUrl: string;
   categoryId: number;
-  networkId: number;
+  networkId: NetworkType;
   deployerId: Address;
   contract: Address;
   points: number;
+};
+
+export type NetworkType = {
+  id?: number;
+  name: string;
+  logoUrl?: string;
+  chainId?: number;
+  explorerUrl?: string;
 };

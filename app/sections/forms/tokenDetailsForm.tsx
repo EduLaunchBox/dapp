@@ -6,6 +6,7 @@ import { useAppDispatch } from "@/app/store/hooks";
 import { TokenDetails } from "@/app/types";
 import { ActionCreatorWithPayload } from "@reduxjs/toolkit";
 import React, { useState } from "react";
+import Swal from "sweetalert2";
 
 export default function TokenDetailsForm({
   formStep,
@@ -38,7 +39,12 @@ export default function TokenDetailsForm({
     if (!decimal) errorMessage = "Decimal must be greater than 0.";
 
     if (errorMessage !== "") {
-      alert(errorMessage);
+      Swal.fire({
+        title: "Error!!",
+        text: errorMessage,
+        icon: "error",
+        cancelButtonText: "Okay",
+      });
       setErrMsg(errorMessage);
       return;
     }

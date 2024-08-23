@@ -6,9 +6,11 @@ import { useAppDispatch } from "@/app/store/hooks";
 import { TokenDetails } from "@/app/types";
 import { ActionCreatorWithPayload } from "@reduxjs/toolkit";
 import axios from "axios";
+import { ethers } from "ethers";
 import { useEffect, useState } from "react";
 import { AiOutlineInfoCircle } from "react-icons/ai";
 import { CiSettings } from "react-icons/ci";
+import Swal from "sweetalert2";
 import { Address } from "viem";
 
 export default function VerifyTokenDetailsForm({
@@ -50,8 +52,13 @@ export default function VerifyTokenDetailsForm({
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     event.preventDefault();
-    if (!tokenName && tokenSymbol) {
-      alert("Please fill details in manually");
+    if (!tokenName || !tokenSymbol || !tokenSupply) {
+      Swal.fire({
+        title: "Error!!",
+        text: "Please ensure all inputs are filled.",
+        icon: "error",
+        cancelButtonText: "Okay",
+      }).finally(() => setBtnLoading(false));
       return;
     }
 
@@ -87,7 +94,11 @@ export default function VerifyTokenDetailsForm({
           );
           if (tokenDetailsResponse?.data?.address === tokenDetails?.contract) {
             setTokenName(tokenDetailsResponse?.data?.name);
-            setTokenSupply(Number(tokenDetailsResponse?.data?.total_supply));
+            setTokenSupply(
+              Number(
+                ethers.formatUnits(tokenDetailsResponse?.data?.total_supply)
+              )
+            );
             setTokenSymbol(tokenDetailsResponse?.data?.symbol);
             setDecimals(Number(tokenDetailsResponse?.data?.decimals));
             setLogoUrl(tokenDetailsResponse?.data?.icon_url);
@@ -103,9 +114,12 @@ export default function VerifyTokenDetailsForm({
             );
           setBtnLoading(false);
         } catch (error) {
-          console.log(error);
-          alert("Something went wrong. Check console for details");
-          setBtnLoading(false);
+          Swal.fire({
+            title: "Error!!",
+            text: (error as any)?.message || "Something Went wrong",
+            icon: "error",
+            cancelButtonText: "Okay",
+          }).finally(() => setBtnLoading(false));
         }
       })();
     }
