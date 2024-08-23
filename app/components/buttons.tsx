@@ -10,6 +10,7 @@ export function Button({
   className,
   disabled,
   loading,
+  customRef,
 }: {
   arrow?: "forward" | "backward";
   text: string;
@@ -18,9 +19,11 @@ export function Button({
   className?: string;
   disabled?: boolean;
   loading?: boolean;
+  customRef?: any;
 }) {
   return (
     <button
+      ref={customRef}
       type="button"
       disabled={disabled || loading}
       className={

@@ -6,6 +6,7 @@ import { useAppDispatch } from "@/app/store/hooks";
 import { TokenDetails } from "@/app/types";
 import { ActionCreatorWithPayload } from "@reduxjs/toolkit";
 import { useState } from "react";
+import Swal from "sweetalert2";
 
 export default function SocialsForm({
   formStep,
@@ -28,9 +29,21 @@ export default function SocialsForm({
   ) => {
     event.preventDefault();
     // Verifications
-    if (!logo) setErrMsg("Please add a logo for your token");
-    if (!twitterUrl) setErrMsg("Please provide an X(formerly Twitter) url.");
-    if (errMsg) return;
+    let errorMessage = "";
+    if (!logo) errorMessage = "Please add a logo for your token";
+    if (!twitterUrl)
+      errorMessage = "Please provide an X(formerly Twitter) url.";
+
+    if (errorMessage !== "") {
+      Swal.fire({
+        title: "Error!!",
+        text: errorMessage,
+        icon: "error",
+        cancelButtonText: "Okay",
+      });
+      setErrMsg(errorMessage);
+      return;
+    }
 
     dispatch(nextStep({ ...tokenDetails, xUrl: twitterUrl, logo }));
   };

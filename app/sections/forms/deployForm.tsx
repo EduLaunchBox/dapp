@@ -7,14 +7,21 @@ import successfulDeployment from "../../assets/images/successfulDeployment.svg";
 import { MdOutlineNorthEast } from "react-icons/md";
 import { useAppDispatch } from "@/app/store/hooks";
 import { useState } from "react";
-import { TokenDetails } from "@/app/types";
+import { NetworkType, TokenDetails } from "@/app/types";
 import { useAccount } from "wagmi";
 import EduLaunchBoxFactoryAbi from "../../lib/abi/EduLaunchBoxFactory.json";
 import { ethers } from "ethers";
-import { config } from "../../providers/wagmi/config";
+import { config, educhain } from "../../providers/wagmi/config";
 import { getEthersSigner } from "@/app/providers/ethers";
 import { stringTruncater } from "@/app/lib/utils";
 import { ActionCreatorWithPayload } from "@reduxjs/toolkit";
+import Swal from "sweetalert2";
+import { Address } from "viem";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+
+const edulaunchboxFactoryAddress = process.env
+  .NEXT_PUBLIC_EDULAUNCHBOX_FACTORY as Address;
 
 export default function DeployForm({
   formStep,
@@ -31,6 +38,7 @@ export default function DeployForm({
   const [tokenDeployed, setTokenDeployed] = useState(false);
   const [tokenData, setTokenData] = useState(tokenDetails);
   const [buttonLoading, setButtonloading] = useState(false);
+  const route = useRouter();
   const { address } = useAccount();
 
   const handleNext = (
@@ -56,7 +64,12 @@ export default function DeployForm({
 
     // Prompt user to connect wallet.
     if (!address) {
-      alert("Please connect your wallet");
+      Swal.fire({
+        title: "Error!!",
+        text: "Please connect your wallet.",
+        icon: "error",
+        confirmButtonText: "Okay",
+      }).finally(() => setButtonloading(false));
       return;
     }
 
@@ -73,7 +86,12 @@ export default function DeployForm({
       const data = await res.json();
       tokenDataCopy = { ...tokenDetails, logoUrl: data.url };
     } catch (error) {
-      console.error("Error uploading file:", error);
+      Swal.fire({
+        title: "Error!!",
+        text: "Could not updateyour image.",
+        icon: "error",
+        confirmButtonText: "Okay",
+      }).finally(() => setButtonloading(false));
       return;
     }
 
@@ -82,7 +100,7 @@ export default function DeployForm({
       // Define the contract configuration
       const signer = await getEthersSigner(config);
       const contract = new ethers.Contract(
-        "0x7584F11Fd490C64886F13396eE5fE58d477D8444", // todo: add to dotenv
+        edulaunchboxFactoryAddress,
         EduLaunchBoxFactoryAbi,
         signer
       );
@@ -104,16 +122,25 @@ export default function DeployForm({
       await contract.newLaunchBox(name, symbol, tokenSupply);
       setTokenData(tokenDataCopy);
       setTokenDeployed(true);
-      console.log(tokenDataCopy);
+      setTokenDeployed(true);
     } catch (error) {
-      console.error("Error deploying contract:", error);
+      Swal.fire({
+        title: "Error!!",
+        text: "Could not deploy token. Please try again.",
+        icon: "error",
+        confirmButtonText: "Try Again.",
+        cancelButtonText: "Okay",
+      })
+        .then(({ isConfirmed }) => {
+          if (isConfirmed) route.refresh();
+        })
+        .finally(() => setButtonloading(false));
       return;
     }
 
     // Update database.
-    // Todo: Update network type to have required network info
     try {
-      const res = await fetch("/api/tokens", {
+      await fetch("/api/tokens", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -121,21 +148,33 @@ export default function DeployForm({
         body: JSON.stringify({
           ...tokenDataCopy,
           logo: null,
-          network: "Etherium",
+          network: {
+            name: tokenDetails?.network?.name || educhain.name,
+            logoUrl: tokenDetails?.network?.logoUrl || educhain.iconUrl,
+            explorerUrl:
+              tokenDetails?.network?.explorerUrl ||
+              educhain.blockExplorers.default.url,
+            chainId: tokenDetails?.network?.chainId || educhain?.id,
+          } as NetworkType,
           deployer: address,
           totalSupply: tokenDetails.tokenSupply
             .toLocaleString()
             .replaceAll(",", ""),
         }),
       });
-
-      const data = await res.json();
-      console.log(data);
       setButtonloading(false);
     } catch (error) {
-      // TODO: Might provide another way for them to add the details ti the database in the error
-      console.error("Error saving data to db:", error);
-      setButtonloading(false);
+      Swal.fire({
+        title: "Error!!",
+        text: "Could not save token details. Try re-deploying.",
+        icon: "error",
+        confirmButtonText: "Redeploy.",
+        cancelButtonText: "Okay",
+      })
+        .then(({ isConfirmed }) => {
+          if (isConfirmed) route.refresh();
+        })
+        .finally(() => setButtonloading(false));
       return;
     }
   };
@@ -158,7 +197,18 @@ export default function DeployForm({
         <span className="flex font-bold text-grey/800 max-xs:w-24 w-32">
           {title}
         </span>
-        <span className="flex font-medium text-nowrap">{value}</span>
+        <span className="flex justify-center font-medium text-nowrap gap-1.5">
+          {logo && (
+            <Image
+              src={logo}
+              alt="Network"
+              width={250}
+              height={250}
+              className="flex object-fit h-6 w-6 rounded-full "
+            />
+          )}
+          <span>{value}</span>
+        </span>
       </div>
     );
   };
@@ -174,7 +224,7 @@ export default function DeployForm({
         <div className="flex gap-2 max-sm:flex-col">
           <div className="flex max-sx:basis-auto basis-1/4">
             <Image
-              className="w-10 h-10"
+              className="w-24 h-24 mx-auto object-fit"
               width={200}
               height={200}
               src={tokenDetails?.logo ? tokenDetails.logo : defaultImage}
@@ -192,8 +242,8 @@ export default function DeployForm({
             />
             <DetailRow
               title="Network"
-              logo={"cc"}
-              value={tokenDetails?.network || "Etherium"}
+              logo={educhain.iconUrl}
+              value={tokenDetails?.network?.name || educhain?.name}
             />
           </div>
         </div>
@@ -225,14 +275,19 @@ export default function DeployForm({
               {/* Max string length the length of below value */}
 
               <div className="flex max-sm:gap-2 gap-4">
+                {/* Add Link: */}
                 <DetailRow
                   className="my-auto"
                   title="Token address"
                   value={stringTruncater(tokenData.contract)}
                 />
-                <button className="flex max-sm:p-1.5 p-2 border-2 border-grey/200 bg-grey/70 my-auto rounded-lg">
+                <Link
+                  target={"_blank"}
+                  href={`https://opencampus-codex.blockscout.com/token/${tokenData.contract}`}
+                  className="flex max-sm:p-1.5 p-2 border-2 cursor-pointer border-grey/200 bg-grey/70 my-auto rounded-lg"
+                >
                   <MdOutlineNorthEast />
-                </button>
+                </Link>
               </div>
             </div>
           </>
@@ -246,7 +301,12 @@ export default function DeployForm({
           </div>
 
           <div className="flex max-sm:basis-auto max-sm:w-full basis-3/4">
-            <Button onclick={handleDeploy} text={"Deploy"} color="green" />
+            <Button
+              loading={buttonLoading}
+              onclick={handleDeploy}
+              text={"Deploy"}
+              color="green"
+            />
           </div>
         </div>
       )}

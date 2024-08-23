@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 import React, { Dispatch, SetStateAction, useState } from "react";
 import { AiOutlineInfoCircle } from "react-icons/ai";
 import { FaPaste } from "react-icons/fa";
@@ -54,6 +55,7 @@ export function SelectInput({
         }
       >
         <select
+          required
           className="flex w-full bg-transparent outline-none p-2 text-grey/800 font-semibold"
           id={id}
           value={value}
@@ -136,6 +138,7 @@ export function Input({
         )}
 
         <input
+          required
           className="flex w-full bg-transparent outline-none placeholder-grey/300 p-2"
           placeholder={placeholder}
           id={id}
@@ -206,26 +209,44 @@ export function ImageInput({
         className="border-2 border border-dashed rounded-md flex max-xs:px-3 px-6 py-10 max-xs:gap-2 gap-4 justify-between"
         htmlFor={id}
       >
-        <div className="flex basis-1/4">
-          <FiUploadCloud
-            color="#A3A3A3"
-            size={"2.5rem"}
-            className="my-auto flex"
+        {preview ? (
+          <Image
+            width={500}
+            height={500}
+            className="flex h-full object-fit"
+            src={URL.createObjectURL(preview)}
+            alt="Preview"
           />
-        </div>
-        <div className="flex basis-1/2">
-          <div className="flex flex-col w-full">
-            <span className="flex flex-nowrap mx-auto text-center text-grey/900 font-bold max-xs:text-[0.75rem] text-[0.875rem] text-nowrap">
-              Choose a file or drag and drop logo here
-            </span>
-            <span className="flex flex-nowrap mx-auto text-center text-grey/100 max-xs:text-[0.5rem] text-[0.75rem] text-nowrap">
-              SVG or png file not exceeding 3mb
-            </span>
-          </div>
-        </div>
-        <div className="flex basis-1/4"></div>
+        ) : (
+          <>
+            <div className="flex basis-1/4">
+              <FiUploadCloud
+                color="#A3A3A3"
+                size={"2.5rem"}
+                className="my-auto flex"
+              />
+            </div>
+            <div className="flex basis-1/2">
+              <div className="flex flex-col w-full">
+                <span className="flex flex-nowrap mx-auto text-center text-grey/900 font-bold max-xs:text-[0.75rem] text-[0.875rem] text-nowrap">
+                  Choose a file or drag and drop logo here
+                </span>
+                <span className="flex flex-nowrap mx-auto text-center text-grey/100 max-xs:text-[0.5rem] text-[0.75rem] text-nowrap">
+                  SVG or png file not exceeding 3mb
+                </span>
+              </div>
+            </div>
+            <div className="flex basis-1/4"></div>
+          </>
+        )}
       </label>
-      <input id={id} type="file" onChange={handleChange} className="hidden" />
+      <input
+        required
+        id={id}
+        type="file"
+        onChange={handleChange}
+        className="hidden"
+      />
     </div>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 import { FiPlusCircle } from "react-icons/fi";
 import { HiOutlineArrowCircleDown } from "react-icons/hi";
-import etheriumLogo from "./assets/images/etherium.png";
+import baseLogo from "./assets/images/base-logo-in-blue.png";
 import bnbLogo from "./assets/images/bnb.png";
 import solanaLogo from "./assets/images/solana.png";
 import polygonLogo from "./assets/images/polygon.png";
@@ -166,7 +166,7 @@ export default function Home() {
           </span>
         </div>
         <div className="flex gap-2 max-lg:flex-wrap">
-          <SupportedChainCard logo={etheriumLogo} chain="Etherium" live />
+          <SupportedChainCard logo={baseLogo} chain="Base" live />
           <SupportedChainCard logo={bnbLogo} chain="BNB Chain" />
           <SupportedChainCard logo={solanaLogo} chain="Solana" />
           <SupportedChainCard logo={polygonLogo} chain="Polygon" />

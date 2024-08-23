@@ -3,29 +3,32 @@ import { Button, ToggleButton } from "@/app/components/buttons";
 import FormContainer from "@/app/components/formContainer";
 import { SelectInput } from "@/app/components/inputsBoxes";
 import Image from "next/image";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { AiOutlineInfoCircle } from "react-icons/ai";
 import eduLogo from "../../assets/images/edu.png";
 import uniLogo from "../../assets/images/uni.png";
 import { PiPlus } from "react-icons/pi";
 import { TwoStepBar } from "@/app/components/progressBar";
-import SailfishLogo from "../../assets/images/sailfish.png";
 import { useAccount, useBalance } from "wagmi";
 import { Address, isAddress, parseEther } from "viem";
 import { useSearchParams } from "next/navigation";
 import { ethers } from "ethers";
 import axios from "axios";
-import { TokenDetails, TokenType } from "@/app/types";
+import { TokenType } from "@/app/types";
 import { ClipLoader } from "react-spinners";
 import { getEthersSigner } from "@/app/providers/ethers";
 import { config } from "@/app/providers/wagmi/config";
 import ERC20Abi from "../../lib/abi/ERC20Abi.json";
 import VaultAbi from "../../lib/abi/vaultAbi.json";
+import poolFactoryAbi from "../../lib/abi/poolFactoryAbi.json";
 import SuccessfullyDeployed from "../popovers/successfullyDeployed";
+import { HelperFaucetAbi } from "../../lib/abi/helperFaucetAbi";
+import Swal from "sweetalert2";
 
 const nativeToken = process.env.NEXT_PUBLIC_NATIVE_TOKEN as Address;
 const vaultContractAddress = process.env.NEXT_PUBLIC_VAULT_CONTRACT as Address;
 const sailfishApikey = process.env.NEXT_PUBLIC_SAILFISH_APIKEY as string;
+const vpfContract = process.env.NEXT_PUBLIC_VPF_CONTRACT as Address;
 
 export default function AddLiquidityForm({
   formStep,
@@ -37,83 +40,87 @@ export default function AddLiquidityForm({
   const [toNotStake, setToNotStake] = useState(false);
   const [baseAmount, setBaseAmount] = useState(0); // Amount of Edu(Native coin) being added as liquidity
   const [qouteAmount, setQouteAmount] = useState(0); // Amount of users token the user is adding for liquidity
-  const [btnLoading, setBtnLoading] = useState(false);
 
   const [quoteTokenAddress, setQuoteTokenAddress] = useState<Address>();
   const searchParams = useSearchParams();
   const [dex, setDex] = useState("");
-  const [showPopup, setShowPopup] = useState(true);
 
+  const [btnLoading, setBtnLoading] = useState(false);
+  const [showPopup, setShowPopup] = useState(false);
   const [quoteToken, setQuoteToken] = useState<TokenType>();
+
   const [tokenLoading, setTokenLoading] = useState<boolean>(true);
   const [tokenApproved, setTokenApproved] = useState(false);
   const [lpAdded, setLpAdded] = useState(false);
+  const [lpAddress, setLpAddress] = useState(""); // Actually a transaction hash tho. For when the liquidity is added
 
+  const approveBtnRef = useRef<HTMLButtonElement>(null);
   const { address } = useAccount();
   const baseTokenBal = useBalance({
     address: address,
   });
 
-  const handleAddLp = async (
-    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
-  ) => {
-    event.preventDefault();
-    setBtnLoading(true);
-    const sailFishBaseURl = "https://app.sailfish.finance";
-
+  const updateDex = async () => {
     try {
+      const sailFishBaseURl = "https://app.sailfish.finance";
       const response = await fetch(quoteToken?.logoUrl || "");
       const imageBlob = await response.blob();
-
       const formData = new FormData();
+
       formData.append("name", quoteToken?.name || "");
       formData.append("address", quoteToken?.contract || "");
       formData.append("created_at", new Date().toISOString());
       formData.append("logo", imageBlob, "image.jpg");
 
-      const { data } = await axios.post(
-        sailFishBaseURl + "/api/tokens",
-        formData,
-        { headers: { "x-api-key": sailfishApikey } }
-      );
-      console.log(data);
-      setShowPopup(true);
-      setLpAdded(true);
-      setBtnLoading(false);
-    } catch (error: any) {
-      console.log(error);
-      alert("Something went wrong. Check console for details");
-      setBtnLoading(false);
+      await axios.post(sailFishBaseURl + "/api/tokens", formData, {
+        headers: { "x-api-key": sailfishApikey },
+      });
+    } catch (error) {
+      throw new Error("Dex upload failed");
     }
   };
 
-  const handleApprove = async (
+  const handleAddLp = async (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     try {
       event.preventDefault();
       setBtnLoading(true);
-      if (!baseAmount || !qouteAmount) {
-        alert("Please add an amount");
-        return;
-      }
 
       // Define the contract configuration
       const signer = await getEthersSigner(config);
-      const uniContract = new ethers.Contract(
-        quoteTokenAddress as Address,
-        ERC20Abi,
-        signer
-      );
       const vaultContract = new ethers.Contract(
         vaultContractAddress,
         VaultAbi,
         signer
       );
 
+      const helperContract = new ethers.Contract(
+        vaultContractAddress,
+        HelperFaucetAbi,
+        signer
+      );
+      const pairAddress = await helperContract.getPair(
+        nativeToken,
+        quoteTokenAddress,
+        signer
+      );
+
       const amountAIn = ethers.parseEther(baseAmount.toString()); //EDU
       const amountBIn = ethers.parseEther(qouteAmount.toString()); //UNI
-      await uniContract.approve(vaultContractAddress, amountBIn); //Let Vault spend UNI
+      const contract = new ethers.Contract(vpfContract, poolFactoryAbi, signer);
+
+      const toToken = (addr: string) => {
+        return ethers.zeroPadValue(addr, 32);
+      };
+
+      if (pairAddress === "0x0000000000000000000000000000000000000000") {
+        const trx = await contract.deploy(
+          toToken(nativeToken),
+          toToken(quoteTokenAddress!)
+        );
+        await trx.wait();
+      }
 
       const res = await vaultContract.addLiquidity(
         nativeToken,
@@ -129,16 +136,67 @@ export default function AddLiquidityForm({
           value: amountAIn,
         }
       );
-      setTokenApproved(true);
+
+      console.log(res.hash);
+      setLpAddress(res.hash);
+      await updateDex();
+      setLpAdded(true);
       setBtnLoading(false);
-      console.log(res);
+      setShowPopup(true);
     } catch (error) {
-      if (String(error).includes('reverted: "duplicated token"')) {
-        setTokenApproved(true);
-        setBtnLoading(false);
+      let errorMsg = "Could not add token liquidity. Please try again.";
+      if (String(error).includes('reverted: "duplicated token"'))
+        errorMsg = "Liquidity has already been added to this token";
+
+      Swal.fire({
+        title: "Error!!",
+        text: errorMsg,
+        icon: "error",
+        cancelButtonText: "Okay",
+      }).finally(() => setBtnLoading(false));
+    }
+  };
+
+  const handleApprove = async (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    event.preventDefault();
+    try {
+      // Define the contract configuration
+      if (!qouteAmount || !baseAmount) {
+        Swal.fire({
+          title: "Error!!",
+          text: "Add your Qoute and Base amount for liquidity",
+          icon: "error",
+          cancelButtonText: "Okay",
+        });
         return;
       }
-      console.log(error);
+
+      setBtnLoading(true);
+      const signer = await getEthersSigner(config);
+      const quoteTokenContract = new ethers.Contract(
+        quoteTokenAddress as Address,
+        ERC20Abi,
+        signer
+      );
+
+      const amountBIn = ethers.parseEther(qouteAmount.toString()); //Qoute token
+      await quoteTokenContract.approve(vaultContractAddress, amountBIn); //Let Vault spend Qoute token
+      setTokenApproved(true);
+      setBtnLoading(false);
+    } catch (error) {
+      Swal.fire({
+        title: "Error!!",
+        text: "Could not Approve token. Please try again.",
+        icon: "error",
+        confirmButtonText: "Try Again.",
+        cancelButtonText: "Okay",
+      })
+        .then(({ isConfirmed }) => {
+          if (isConfirmed) approveBtnRef?.current?.click();
+        })
+        .finally(() => setBtnLoading(false));
     }
   };
 
@@ -291,7 +349,12 @@ export default function AddLiquidityForm({
             }}
             stepTwo={{
               name: "Add LP",
-              status: !tokenApproved ? "undone" : "doing",
+              status:
+                !tokenApproved && !lpAdded
+                  ? "undone"
+                  : tokenApproved && !lpAdded
+                  ? "doing"
+                  : "done",
             }}
           />
         </div>
@@ -311,6 +374,7 @@ export default function AddLiquidityForm({
           />
         ) : (
           <Button
+            customRef={approveBtnRef}
             onclick={handleApprove}
             text={"Approve " + (baseTokenBal?.data?.symbol || "EDU")}
             color="green"
@@ -329,6 +393,8 @@ export default function AddLiquidityForm({
         }
         show={showPopup}
         setShow={setShowPopup}
+        lpAddress={lpAddress}
+        tokenAddress={quoteTokenAddress || ""}
       />
     </FormContainer>
   );
@@ -394,6 +460,8 @@ const TokenInput = ({
       <div className="flex w-full gap-2">
         <input
           type={"number"}
+          required
+          min={0}
           onChange={(event) => setValue(Number(event.target.value))}
           className="flex w-full bg-transparent border-none leading-none outline-none max-sm:text-[1.5rem] text-[2rem] font-medium placeholder-grey/400"
           placeholder="0.00"
