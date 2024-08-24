@@ -61,6 +61,13 @@ export async function POST(request: Request) {
       },
     });
 
+    // Create liquidity
+    await prisma.liquidity.create({
+      data: {
+        tokenId: newToken.id,
+      },
+    });
+
     return NextResponse.json(
       { message: "Token Created Successfully", data: newToken },
       { status: 201 }

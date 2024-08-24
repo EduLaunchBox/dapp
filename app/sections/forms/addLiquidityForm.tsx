@@ -43,7 +43,7 @@ export default function AddLiquidityForm({
 
   const [quoteTokenAddress, setQuoteTokenAddress] = useState<Address>();
   const searchParams = useSearchParams();
-  const [dex, setDex] = useState("");
+  const [dex, setDex] = useState("Sailfish");
 
   const [btnLoading, setBtnLoading] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
@@ -59,6 +59,26 @@ export default function AddLiquidityForm({
   const baseTokenBal = useBalance({
     address: address,
   });
+
+  const updateLiquidityModel = async () => {
+    try {
+      const response = await axios.post("/api/liquidity", {
+        token: quoteToken,
+        dex: dex,
+        quoteAmount: qouteAmount.toLocaleString() + " " + quoteToken?.symbol,
+        baseAmount:
+          baseAmount.toLocaleString() + " " + baseTokenBal?.data?.symbol ||
+          "EDU",
+      });
+
+      console.table("New Dex Created and Liquidity Updated:", response.data);
+    } catch (error) {
+      console.error(
+        "Error creating new dex and updating liquidity:",
+        (error as any).response?.data || (error as any).message
+      );
+    }
+  };
 
   const updateDex = async () => {
     try {
@@ -137,14 +157,15 @@ export default function AddLiquidityForm({
         }
       );
 
-      console.log(res.hash);
       setLpAddress(res.hash);
-      await updateDex();
       setLpAdded(true);
-      setBtnLoading(false);
+
+      await updateLiquidityModel();
+      await updateDex();
       setShowPopup(true);
+      setBtnLoading(false);
     } catch (error) {
-      let errorMsg = "Could not add token liquidity. Please try again.";
+      let errorMsg = "Something went wrong. Please try again.";
       if (String(error).includes('reverted: "duplicated token"'))
         errorMsg = "Liquidity has already been added to this token";
 
@@ -202,12 +223,12 @@ export default function AddLiquidityForm({
 
   // Get token details from db if tokenAddress
   useEffect(() => {
-    if (quoteTokenAddress)
+    if (quoteTokenAddress || tokenAddress)
       (async () => {
         try {
           setTokenLoading(true);
           const { data } = await axios.get(
-            "/api/tokens?tokenAddress=" + quoteTokenAddress
+            "/api/tokens?tokenAddress=" + (quoteTokenAddress || tokenAddress)
           );
           setQuoteToken(data.data);
           setTokenLoading(false);
@@ -216,7 +237,7 @@ export default function AddLiquidityForm({
           alert("Something went wrong. Check console");
         }
       })();
-  }, [quoteTokenAddress]);
+  }, [quoteTokenAddress, tokenAddress]);
 
   useEffect(() => {
     if (tokenAddress) {
@@ -263,8 +284,8 @@ export default function AddLiquidityForm({
           id={"addLiquidity"}
           setValue={setDex}
         >
-          <option value={"Sailfish"} className="flex gap-2 p-1 text-grey/800">
-            Sailfish
+          <option value={dex} className="flex gap-2 p-1 text-grey/800">
+            {dex}
           </option>
         </SelectInput>
 

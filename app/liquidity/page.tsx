@@ -1,4 +1,5 @@
 "use client";
+import axios from "axios";
 import Image from "next/image";
 import TableContainer from "../components/tableContainer";
 import { MdOutlineNorthEast } from "react-icons/md";
@@ -6,8 +7,57 @@ import { Button } from "../components/buttons";
 import logo from "../assets/images/uni-blue.png";
 import sailfishLogo from "../assets/images/sailfish.png";
 import Link from "next/link";
+import Swal from "sweetalert2";
+import { useState, useEffect } from "react";
+import { LiquidityType } from "../types";
+import { shortenAddress } from "../lib/utils";
+import { useAccount } from "wagmi";
 
 export default function Liquidity() {
+  const [liquidities, setLiquidities] = useState<LiquidityType[]>([]);
+  const { address } = useAccount();
+
+  useEffect(() => {
+    async function loadLiquidities() {
+      try {
+        if (!address) {
+          Swal.fire({
+            title: "Error!!",
+            text: "Please connect your wallet",
+            icon: "error",
+            confirmButtonText: "Okay",
+          });
+          return;
+        }
+
+        const { data } = await axios.get("/api/liquidity", {
+          params: {
+            page: 1,
+            pageSize: 1000,
+            deployer: address,
+          },
+        });
+
+        setLiquidities(data?.data?.data);
+        console.table(data?.data?.data);
+        console.log("Paginated List of Liquidities:", data);
+      } catch (error) {
+        console.error(
+          "Error fetching paginated liquidities:",
+          (error as any).response?.data || (error as any).message
+        );
+        Swal.fire({
+          title: "Error",
+          text: "Error fetching liquidities",
+          icon: "error",
+          cancelButtonText: "Okay",
+        });
+      }
+    }
+
+    loadLiquidities();
+  }, [address]);
+
   const TableRow = ({
     token,
     symbol,
@@ -33,14 +83,16 @@ export default function Liquidity() {
   }) => {
     return (
       <tr className="flex max-xl:w-fit w-full grow gap-4 py-2">
-        <td className="flex my-auto min-w-[10rem]">
+        <td className="flex my-auto min-w-[12rem] max-w-[12rem]">
           <span className="flex w-full gap-3">
             <Image
               className="flex w-6 h-6 rounded-full object-fit"
+              width={500}
+              height={500}
               src={logo}
               alt={token}
             />
-            <span className="flex text-grey/700 max-lg:text-[0.875rem] font-medium">
+            <span className="flex text-grey/700 max-lg:text-[0.875rem] truncate font-medium">
               {token}
             </span>
           </span>
@@ -53,26 +105,34 @@ export default function Liquidity() {
         <td className="flex my-auto max-lg:min-w-[7rem] min-w-[9rem]">
           <span className="flex gap-2">
             <span className="flex text-grey/700 max-lg:text-[0.75rem] text-[0.875rem] my-auto font-medium">
-              {address}
+              {shortenAddress(address)}
             </span>
-            <button className="flex my-auto">
+            <Link
+              target={"_blank"}
+              href={`https://opencampus-codex.blockscout.com/token/${address}`}
+              className="flex cursor-pointer my-auto"
+            >
               <MdOutlineNorthEast />
-            </button>
+            </Link>
           </span>
         </td>
         <td className="flex my-auto max-lg:min-w-[6rem] min-w-[8rem]">
           <span className="flex w-full gap-2">
-            <Image
-              className="flex w-6 h-6 rounded-full object-fit"
-              src={dexLogo}
-              alt={dex}
-            />
+            {hasLiquity && (
+              <Image
+                className="flex w-6 h-6 rounded-full object-fit"
+                width={500}
+                height={500}
+                src={dexLogo}
+                alt={dex}
+              />
+            )}
             <span className="flex text-grey/700 max-lg:text-[0.75rem] text-[0.875rem] font-medium">
               {dex}
             </span>
           </span>
         </td>
-        <td className="flex grow my-auto max-xl:w-[15rem] w-full">
+        <td className="flex grow my-auto max-xl:w-[12rem] w-full">
           {!hasLiquity && (
             <span className="flex max-lg:text-[0.75rem] text-[0.875rem] text-nowrap font-medium text-grey/700">
               No Liquidity
@@ -83,7 +143,7 @@ export default function Liquidity() {
               <span className="text-nowrap">{eduAmt}</span>
               <span className="text-nowrap">+</span>
               <span className="text-nowrap">{uniAmt}</span>
-              <span className="text-nowrap">({worthUsdt})</span>
+              {/* <span className="text-nowrap">({worthUsdt})</span> */}
             </span>
           )}
         </td>
@@ -92,7 +152,7 @@ export default function Liquidity() {
             href={{
               pathname: "/liquidity/add-liquidity",
               query: {
-                tokenAddress: "0xd112D88BaD1556bcD5B55cBA596eBA80d55860c9",
+                tokenAddress: address,
               },
             }}
             className="flex w-full my-auto "
@@ -123,159 +183,75 @@ export default function Liquidity() {
 
         <div className="flex w-full">
           <TableContainer
-            className="flex w-full max-xl:overflow-x-auto"
+            className="flex flex-col w-full max-xl:overflow-x-auto"
             title="Deployed/Migrated tokens"
           >
-            <table className="flex flex-col w-full">
-              <thead className="flex border-b max-xl:w-fit w-full border-primary/100 py-3 px-6 font-medium text-grey/700">
-                <tr className="flex gap-4 w-full">
-                  <th className="flex max-lg:text-[0.875rem] min-w-[10rem]">
-                    <span className="flex font-medium text-grey/700 text-nowrap">
-                      Token name
-                    </span>
-                  </th>
-                  <th className="flex max-lg:min-w-[3rem] max-lg:text-[0.875rem] min-w-[4rem]">
-                    <span className="flex font-medium text-grey/700 text-nowrap">
-                      Symbol
-                    </span>
-                  </th>
-                  <th className="flex max-lg:min-w-[7rem] max-lg:text-[0.875rem] min-w-[9rem]">
-                    <span className="flex font-medium text-grey/700 text-nowrap">
-                      Token address
-                    </span>
-                  </th>
-                  <th className="flex max-lg:min-w-[6rem] max-lg:text-[0.875rem] min-w-[8rem]">
-                    <span className="flex font-medium text-grey/700 text-nowrap">
-                      DEX
-                    </span>
-                  </th>
-                  <th className="flex max-xl:w-[15rem] max-lg:text-[0.875rem] w-full">
-                    <span className="flex font-medium text-grey/700 text-nowrap">
-                      Liquidity
-                    </span>
-                  </th>
-                  <th className="flex max-lg:min-w-[6rem] min-w-[8rem] max-lg:text-[0.875rem]">
-                    <span className="flex font-medium text-grey/700 text-nowrap">
-                      Action
-                    </span>
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="flex flex-col px-6 py-3">
-                {[
-                  {
-                    token: "Univeristy",
-                    symbol: "UNI",
-                    logo: logo,
-                    address: "0x742......4438",
-                    dex: "Sailfish",
-                    dexLogo: sailfishLogo,
-                    hasLiquity: false,
-                    eduAmt: "25,3836 EDU",
-                    uniAmt: "300,374 UNI",
-                    worthUsdt: "$8,374",
-                  },
-                  {
-                    token: "Univeristy",
-                    symbol: "UNI",
-                    logo: logo,
-                    address: "0x742......4438",
-                    dex: "Sailfish",
-                    dexLogo: sailfishLogo,
-                    hasLiquity: true,
-                    eduAmt: "25,3836 EDU",
-                    uniAmt: "300,374 UNI",
-                    worthUsdt: "$8,374",
-                  },
-                  {
-                    token: "Univeristy",
-                    symbol: "UNI",
-                    logo: logo,
-                    address: "0x742......4438",
-                    dex: "Sailfish",
-                    dexLogo: sailfishLogo,
-                    hasLiquity: true,
-                    eduAmt: "25,3836 EDU",
-                    uniAmt: "300,374 UNI",
-                    worthUsdt: "$8,374",
-                  },
-                  {
-                    token: "Univeristy",
-                    symbol: "UNI",
-                    logo: logo,
-                    address: "0x742......4438",
-                    dex: "Sailfish",
-                    dexLogo: sailfishLogo,
-                    hasLiquity: false,
-                    eduAmt: "25,3836 EDU",
-                    uniAmt: "300,374 UNI",
-                    worthUsdt: "$8,374",
-                  },
-                  {
-                    token: "Univeristy",
-                    symbol: "UNI",
-                    logo: logo,
-                    address: "0x742......4438",
-                    dex: "Sailfish",
-                    dexLogo: sailfishLogo,
-                    hasLiquity: true,
-                    eduAmt: "25,3836 EDU",
-                    uniAmt: "300,374 UNI",
-                    worthUsdt: "$8,374",
-                  },
-                  {
-                    token: "Univeristy",
-                    symbol: "UNI",
-                    logo: logo,
-                    address: "0x742......4438",
-                    dex: "Sailfish",
-                    dexLogo: sailfishLogo,
-                    hasLiquity: true,
-                    eduAmt: "25,3836 EDU",
-                    uniAmt: "300,374 UNI",
-                    worthUsdt: "$8,374",
-                  },
-                  {
-                    token: "Univeristy",
-                    symbol: "UNI",
-                    logo: logo,
-                    address: "0x742......4438",
-                    dex: "Sailfish",
-                    dexLogo: sailfishLogo,
-                    hasLiquity: true,
-                    eduAmt: "25,3836 EDU",
-                    uniAmt: "300,374 UNI",
-                    worthUsdt: "$8,374",
-                  },
-                  {
-                    token: "Univeristy",
-                    symbol: "UNI",
-                    logo: logo,
-                    address: "0x742......4438",
-                    dex: "Sailfish",
-                    dexLogo: sailfishLogo,
-                    hasLiquity: false,
-                    eduAmt: "25,3836 EDU",
-                    uniAmt: "300,374 UNI",
-                    worthUsdt: "$8,374",
-                  },
-                  {
-                    token: "Univeristy",
-                    symbol: "UNI",
-                    logo: logo,
-                    address: "0x742......4438",
-                    dex: "Sailfish",
-                    dexLogo: sailfishLogo,
-                    hasLiquity: true,
-                    eduAmt: "25,3836 EDU",
-                    uniAmt: "300,374 UNI",
-                    worthUsdt: "$8,374",
-                  },
-                ].map((item, index) => {
-                  return <TableRow key={index} {...item} />;
-                })}
-              </tbody>
-            </table>
+            {liquidities.length > 0 && (
+              <table className="flex flex-col w-full">
+                <thead className="flex border-b max-xl:w-fit w-full border-primary/100 py-3 px-6 font-medium text-grey/700">
+                  <tr className="flex gap-4 w-full">
+                    <th className="flex max-lg:text-[0.875rem] min-w-[12rem]">
+                      <span className="flex font-medium text-grey/700 text-nowrap">
+                        Token name
+                      </span>
+                    </th>
+                    <th className="flex max-lg:min-w-[3rem] max-lg:text-[0.875rem] min-w-[4rem]">
+                      <span className="flex font-medium text-grey/700 text-nowrap">
+                        Symbol
+                      </span>
+                    </th>
+                    <th className="flex max-lg:min-w-[7rem] max-lg:text-[0.875rem] min-w-[9rem]">
+                      <span className="flex font-medium text-grey/700 text-nowrap">
+                        Token address
+                      </span>
+                    </th>
+                    <th className="flex max-lg:min-w-[6rem] max-lg:text-[0.875rem] min-w-[8rem]">
+                      <span className="flex font-medium text-grey/700 text-nowrap">
+                        DEX
+                      </span>
+                    </th>
+                    <th className="flex max-xl:w-[12rem] max-lg:text-[0.875rem] w-full">
+                      <span className="flex font-medium text-grey/700 text-nowrap">
+                        Liquidity
+                      </span>
+                    </th>
+                    <th className="flex max-lg:min-w-[6rem] min-w-[8rem] max-lg:text-[0.875rem]">
+                      <span className="flex font-medium text-grey/700 text-nowrap">
+                        Action
+                      </span>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="flex flex-col px-6 py-3">
+                  {liquidities?.map((item, index) => {
+                    return (
+                      <TableRow
+                        key={index}
+                        token={item.token?.name!}
+                        symbol={item.token?.symbol!}
+                        logo={item.token?.logoUrl}
+                        address={item.token?.contract!}
+                        dex={item.dex?.name || "No Dex"}
+                        dexLogo={item.dex?.logoUrl || sailfishLogo}
+                        hasLiquity={Boolean(item?.dex)}
+                        eduAmt={item.baseAmount || ""}
+                        uniAmt={item?.quoteAmount || ""}
+                        worthUsdt={""}
+                      />
+                    );
+                  })}
+                </tbody>
+              </table>
+            )}
+            {liquidities.length === 0 && (
+              <div className="flex p-4 font-semibold gap-1 mx-auto text-grey/800">
+                <span>This account has no deployed tokens. Check out</span>
+                <Link className="text-primary/500" href={"/create-tokens"}>
+                  Create Tokens
+                </Link>
+                <span>to get started</span>
+              </div>
+            )}
           </TableContainer>
         </div>
       </div>

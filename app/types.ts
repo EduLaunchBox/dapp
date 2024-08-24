@@ -39,3 +39,21 @@ export type NetworkType = {
   chainId?: number;
   explorerUrl?: string;
 };
+
+type Dex = {
+  id?: number;
+  name?: string;
+  logoUrl?: string;
+};
+
+export type LiquidityType = {
+  id?: number;
+  tokenId?: number;
+  dexId?: number;
+  quoteAmount?: string;
+  baseAmount?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  token?: TokenType;
+  dex?: Dex;
+};
