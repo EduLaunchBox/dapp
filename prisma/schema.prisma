@@ -8,15 +8,15 @@ generator client {
   provider = "prisma-client-js"
 }
 
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-}
-
 // datasource db {
-//   provider = "sqlite"
-//   url      = "file:./dev.db"
+//   provider = "postgresql"
+//   url      = env("DATABASE_URL")
 // }
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
 
 model SailfishApikey {
   id          Int      @id @default(autoincrement())
@@ -67,10 +67,10 @@ model Liquidity {
   id          Int      @id @default(autoincrement())
   token       Token    @relation(fields: [tokenId], references: [id])
   tokenId     Int
-  dex         Dex      @relation(fields: [dexId], references: [id])
-  dexId       Int
-  quoteAmount Int
-  baseAmount  Int
+  dex         Dex?      @relation(fields: [dexId], references: [id])
+  dexId       Int?
+  quoteAmount String?
+  baseAmount  String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
