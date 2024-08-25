@@ -28,6 +28,19 @@ export async function POST(request: Request) {
     }
   }
 
+  // Get token update it with points
+  const pointsAwarded =
+    (Number(String(baseAmount).split(" ")[0]) / 0.1) * 1000000;
+  console.log("pointsAwarded ==>> ", pointsAwarded);
+  await prisma.token.update({
+    where: {
+      id: token.id,
+    },
+    data: {
+      points: token.points + pointsAwarded,
+    },
+  });
+
   // Check if liquidity for the token already exists
   const existingLiquidity = await prisma.liquidity.findFirst({
     where: {

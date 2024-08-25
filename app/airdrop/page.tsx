@@ -1,3 +1,4 @@
+"use client";
 import Image from "next/image";
 import TableContainer from "../components/tableContainer";
 import firstPlace from "../assets/images/firstPlace.png";
@@ -5,8 +6,61 @@ import secondPlace from "../assets/images/secondPlace.png";
 import thirdPlace from "../assets/images/thirdPlace.png";
 import BannerContainer from "../components/bannerContainer";
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { useAccount } from "wagmi";
+import Swal from "sweetalert2";
+import axios from "axios";
+import { UserType } from "../types";
+import { Address } from "viem";
+import { shortenAddress } from "../lib/utils";
 
 export default function Airdrop() {
+  const { address } = useAccount();
+  const [users, setUsers] = useState<UserType[]>([]);
+  const [currentUserPoints, setCurrentUserPoints] = useState<string>("0.00");
+  const [currentUserRank, setCurrentUserRank] = useState<number>(0);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        if (!address) {
+          Swal.fire({
+            title: "Error!!",
+            text: "Please connect your wallet",
+            icon: "error",
+            confirmButtonText: "Okay",
+          });
+          return;
+        }
+
+        const { data } = await axios.get("/api/airdrop");
+
+        setUsers(data?.data);
+        console.table(data?.data);
+      } catch (error) {
+        console.error(
+          "Error:",
+          (error as any).response?.data || (error as any).message
+        );
+        Swal.fire({
+          title: "Error",
+          text: "Error fetching users",
+          icon: "error",
+          cancelButtonText: "Okay",
+        });
+      }
+    })();
+  }, [address]);
+
+  useEffect(() => {
+    users.forEach((user, index) => {
+      if (user.address === address) {
+        setCurrentUserPoints(user.points?.toLocaleString() || "0.00");
+        setCurrentUserRank(index + 1);
+      }
+    });
+  }, [address, users]);
+
   const TableRow = ({
     rank,
     userAddress,
@@ -80,7 +134,7 @@ export default function Airdrop() {
               " flex w-full my-auto max-md:text-[0.75rem] text-[0.875rem] font-black"
             }
           >
-            {points}
+            {points} EP
           </span>
         </td>
       </tr>
@@ -108,7 +162,7 @@ export default function Airdrop() {
                   Box Points earned
                 </span>
                 <span className="flex max-xl:text-[1.25rem] text-[1.75rem] text-secondary/500 font-extrabold mx-auto text-nowrap">
-                  0.00 EP
+                  {currentUserPoints} EP
                 </span>
               </div>
               <div className="flex max-md:py-2 max-lg:px-6 px-8 justify-center rounded-xl flex-col border-grey/50/25 border bg-grey/50/5">
@@ -116,7 +170,7 @@ export default function Airdrop() {
                   Your rank
                 </span>
                 <span className="flex max-xl:text-[1.25rem] text-[1.75rem] text-secondary/500 font-extrabold mx-auto">
-                  26,038
+                  {currentUserRank}
                 </span>
               </div>
               <div className="flex max-md:py-2 max-sm:w-full max-lg:px-6 px-8 justify-center rounded-xl flex-col border-grey/50/25 border gap-1 bg-grey/50/5">
@@ -164,54 +218,15 @@ export default function Airdrop() {
                 </tr>
               </thead>
               <tbody className="flex flex-col gap-1 px-3 py-4">
-                {[
-                  {
-                    rank: 1,
-                    userAddress: "0x742......4438",
-                    points: "23,000,000 EP",
-                  },
-                  {
-                    rank: 2,
-                    userAddress: "0x742......4438",
-                    points: "23,000,000 EP",
-                  },
-                  {
-                    rank: 3,
-                    userAddress: "0x742......4438",
-                    points: "23,000,000 EP",
-                  },
-                  {
-                    rank: 4,
-                    userAddress: "0x742......4438",
-                    points: "23,000,000 EP",
-                  },
-                  {
-                    rank: 5,
-                    userAddress: "0x742......4438",
-                    points: "23,000,000 EP",
-                  },
-                  {
-                    rank: 6,
-                    userAddress: "0x742......4438",
-                    points: "23,000,000 EP",
-                  },
-                  {
-                    rank: 7,
-                    userAddress: "0x742......4438",
-                    points: "23,000,000 EP",
-                  },
-                  {
-                    rank: 8,
-                    userAddress: "0x742......4438",
-                    points: "23,000,000 EP",
-                  },
-                  {
-                    rank: 9,
-                    userAddress: "0x742......4438",
-                    points: "23,000,000 EP",
-                  },
-                ].map((item, index) => {
-                  return <TableRow key={index} {...item} />;
+                {users.map((item, index) => {
+                  return (
+                    <TableRow
+                      key={index}
+                      rank={index + 1}
+                      userAddress={shortenAddress(item.address!) as Address}
+                      points={item.points?.toLocaleString() || "0.00"}
+                    />
+                  );
                 })}
               </tbody>
             </table>

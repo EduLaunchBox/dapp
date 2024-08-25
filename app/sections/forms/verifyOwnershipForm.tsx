@@ -5,12 +5,14 @@ import { Input, SelectInput } from "@/app/components/inputsBoxes";
 import { getEthersSigner } from "@/app/providers/ethers";
 import { config } from "@/app/providers/wagmi/config";
 import { useAppDispatch } from "@/app/store/hooks";
+import { updateOldTokenAddress } from "@/app/store/slice/migrateToken";
 import { ActionCreatorWithPayload } from "@reduxjs/toolkit";
 import axios from "axios";
 import { ethers } from "ethers";
 import { useState } from "react";
 import Swal from "sweetalert2";
 import { Address } from "viem";
+import { useAccount } from "wagmi";
 
 const basescanApikey = process.env.NEXT_PUBLIC_BASESCAN_APIKEY as string;
 
@@ -30,6 +32,7 @@ export default function VerifyOwnershipForm({
   const [tokenType, setTokenType] = useState("");
   const [tokenContractAdd, setTokenContractAdd] = useState("");
   const [btnLoading, setBtnLoading] = useState(false);
+  const { address } = useAccount();
 
   const ETHERSCAN_APIS = {
     baseSepolia: `https://api-sepolia.basescan.org/api?module=contract&action=getcontractcreation&contractaddresses=${tokenContractAdd}&apikey=${basescanApikey}`,
@@ -53,6 +56,16 @@ export default function VerifyOwnershipForm({
         return;
       }
 
+      if (!address) {
+        Swal.fire({
+          title: "Error!!",
+          text: "Please connect your wallet.",
+          icon: "error",
+          cancelButtonText: "Okay",
+        }).finally(() => setBtnLoading(false));
+        return;
+      }
+
       const signer = await getEthersSigner(config);
       const { data } = await axios.get(ETHERSCAN_APIS.baseSepolia); // Todo: make more flexible
       const contractCreator = data?.result?.[0]?.contractCreator as string;
@@ -66,6 +79,7 @@ export default function VerifyOwnershipForm({
         recoveredAddress.toLowerCase() === contractCreator.toLowerCase();
       if (isCreator) {
         dispatch(verificationNext(tokenContractAdd as Address));
+        dispatch(updateOldTokenAddress(tokenContractAdd as Address));
       } else {
         Swal.fire({
           text: "This account did not deploy this token",

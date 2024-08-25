@@ -5,7 +5,7 @@ import Image from "next/image";
 import defaultImage from "../../assets/images/default_token.svg";
 import successfulDeployment from "../../assets/images/successfulDeployment.svg";
 import { MdOutlineNorthEast } from "react-icons/md";
-import { useAppDispatch } from "@/app/store/hooks";
+import { useAppDispatch, useAppSelector } from "@/app/store/hooks";
 import { useState } from "react";
 import { NetworkType, TokenDetails } from "@/app/types";
 import { useAccount } from "wagmi";
@@ -17,9 +17,12 @@ import { stringTruncater } from "@/app/lib/utils";
 import { ActionCreatorWithPayload } from "@reduxjs/toolkit";
 import Swal from "sweetalert2";
 import { Address } from "viem";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
+import axios from "axios";
+import tokenABI from "../../lib/abi/ERC20Abi.json";
 
+const senderAddress = process.env.NEXT_PUBLIC_SENDER_ADDRESS as Address;
 const edulaunchboxFactoryAddress = process.env
   .NEXT_PUBLIC_EDULAUNCHBOX_FACTORY as Address;
 
@@ -34,11 +37,14 @@ export default function DeployForm({
   prevStep: any;
   tokenDetails: TokenDetails;
 }) {
+  const route = useRouter();
   const dispatch = useAppDispatch();
+  const pathname = usePathname();
+  const { oldTokenAddress } = useAppSelector((state) => state.migrateToken);
+
   const [tokenDeployed, setTokenDeployed] = useState(false);
   const [tokenData, setTokenData] = useState(tokenDetails);
   const [buttonLoading, setButtonloading] = useState(false);
-  const route = useRouter();
   const { address } = useAccount();
 
   const handleNext = (
@@ -53,6 +59,27 @@ export default function DeployForm({
   ) => {
     event.preventDefault();
     dispatch(prevStep());
+  };
+
+  const handleMigrate = async (tokenAddress: string) => {
+    const { data } = await axios.post("api/tokens/transfer", {
+      tokenAddress,
+      oldTokenAddress,
+      tokenOwner: address,
+    });
+    console.log(data);
+  };
+
+  const approveMigrateTokens = async (tokenAddress: string, amount: string) => {
+    try {
+      const signer = await getEthersSigner(config);
+      const tokenContract = new ethers.Contract(tokenAddress, tokenABI, signer);
+      const tx = await tokenContract.approve(senderAddress, amount);
+      await tx.wait();
+      console.log(tx);
+    } catch (error) {
+      console.error("Error requesting approval:", error);
+    }
   };
 
   const handleDeploy = async (
@@ -119,7 +146,17 @@ export default function DeployForm({
       tokenDataCopy.contract = contractAddress;
 
       // Token Launch
-      await contract.newLaunchBox(name, symbol, tokenSupply);
+      const tokenLaunch = await contract.newLaunchBox(
+        name,
+        symbol,
+        tokenSupply
+      );
+      await tokenLaunch.wait();
+      if (pathname.includes("migrate-tokens")) {
+        await approveMigrateTokens(contractAddress, tokenSupply.toString());
+        await handleMigrate(contractAddress);
+      }
+
       setTokenData(tokenDataCopy);
       setTokenDeployed(true);
       setTokenDeployed(true);

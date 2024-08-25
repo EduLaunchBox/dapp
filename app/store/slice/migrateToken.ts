@@ -5,6 +5,7 @@ import { Address } from "viem";
 
 export interface MigrateTokenState {
   formStep: number;
+  oldTokenAddress: string;
   verificationStep: number;
   verified: boolean;
   tokenDetails: TokenDetails;
@@ -29,6 +30,7 @@ const initialState: MigrateTokenState = {
     holders: undefined,
   },
   verified: false,
+  oldTokenAddress: "",
 };
 
 export const migrateTokenSlice = createSlice({
@@ -50,11 +52,19 @@ export const migrateTokenSlice = createSlice({
     verificationPrev: (state) => {
       state.verificationStep -= 1;
     },
+    updateOldTokenAddress: (state, action: PayloadAction<Address>) => {
+      state.oldTokenAddress = action.payload;
+    },
   },
 });
 
 // Action creators are generated for each case reducer function
-export const { nextStep, prevStep, verificationNext, verificationPrev } =
-  migrateTokenSlice.actions;
+export const {
+  nextStep,
+  prevStep,
+  verificationNext,
+  verificationPrev,
+  updateOldTokenAddress,
+} = migrateTokenSlice.actions;
 
 export default migrateTokenSlice.reducer;

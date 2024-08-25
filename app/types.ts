@@ -30,6 +30,13 @@ export type TokenType = {
   deployerId: Address;
   contract: Address;
   points: number;
+  category?: CategoryType;
+  Liquidity?: LiquidityType[];
+};
+
+export type CategoryType = {
+  name: string;
+  id: number;
 };
 
 export type NetworkType = {
@@ -44,6 +51,11 @@ type Dex = {
   id?: number;
   name?: string;
   logoUrl?: string;
+};
+
+export type UserType = {
+  address?: string;
+  points?: number;
 };
 
 export type LiquidityType = {
