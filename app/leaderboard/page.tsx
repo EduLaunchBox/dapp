@@ -1,10 +1,52 @@
+"use client";
 import Image from "next/image";
 import TableContainer from "../components/tableContainer";
-import logo from "../assets/images/uni-purple.png";
+import defaultLogo from "../assets/images/uni-purple.png";
 import Link from "next/link";
 import BannerContainer from "../components/bannerContainer";
+import { TokenType } from "../types";
+import axios from "axios";
+import { useState, useEffect } from "react";
+import Swal from "sweetalert2";
+import { useAccount } from "wagmi";
+import { stringTruncater } from "../lib/utils";
 
 export default function Leaderboard() {
+  const { address } = useAccount();
+  const [tokens, setTokens] = useState<TokenType[]>([]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        if (!address) {
+          Swal.fire({
+            title: "Error!!",
+            text: "Please connect your wallet",
+            icon: "error",
+            confirmButtonText: "Okay",
+          });
+          return;
+        }
+
+        const { data } = await axios.get("/api/leaderboard");
+
+        setTokens(data?.data);
+        console.table(data?.data);
+      } catch (error) {
+        console.error(
+          "Error:",
+          (error as any).response?.data || (error as any).message
+        );
+        Swal.fire({
+          title: "Error",
+          text: "Error fetching Dapps",
+          icon: "error",
+          cancelButtonText: "Okay",
+        });
+      }
+    })();
+  }, [address]);
+
   const TableRow = ({
     token,
     xHandle,
@@ -12,7 +54,7 @@ export default function Leaderboard() {
     logo,
     type,
     liquidity,
-    holders,
+    tokenAddress,
     pointsEarned,
   }: {
     token: string;
@@ -21,30 +63,54 @@ export default function Leaderboard() {
     logo: any;
     type: string;
     liquidity: string;
-    holders: string;
+    tokenAddress: string;
     pointsEarned: string;
   }) => {
+    const [holders, setHolders] = useState<number>(1);
+
+    useEffect(() => {
+      const getHolders = async (address: string) => {
+        try {
+          const { data } = await axios.get(
+            `https://opencampus-codex.blockscout.com/api/v2/tokens/${address}/counters`
+          );
+          setHolders(Number(data.token_holders_count));
+        } catch {
+          return;
+        }
+      };
+      getHolders(tokenAddress);
+    });
+
     return (
       <tr className="flex w-full max-md:w-fit justify-between max-md:text-[0.875rem] gap-4 py-3">
-        <td className="flex my-auto min-w-[10rem]">
+        <td className="flex my-auto min-w-[15rem]">
           <span className="flex w-full gap-3">
             <Image
               className="flex w-8 h-8 rounded-full object-fit my-auto"
-              src={logo}
+              width={500}
+              height={500}
+              src={logo || defaultLogo}
               alt={token}
             />
             <div className="flex flex-col gap-0 my-auto">
               <span className="flex text-grey/700 font-medium gap-2">
-                <span className="flex font-bold">{token}</span>
+                <span className="flex text-nowrap font-bold">
+                  {stringTruncater(token)}
+                </span>
                 <span>{symbol}</span>
               </span>
-              <span className="flex leading-none max-md:text-[0.75rem] text-[0.875rem] text-primary/400 font-extrabold">
-                {xHandle}
-              </span>
+              <Link
+                target={"_blank"}
+                href={String(xHandle)}
+                className="flex leading-none max-md:text-[0.75rem] text-[0.875rem] text-primary/400 font-extrabold"
+              >
+                {token}
+              </Link>
             </div>
           </span>
         </td>
-        <td className="flex my-auto min-w-[4rem]">
+        <td className="flex my-auto min-w-[6rem]">
           <span className="flex max-md:text-[0.75rem] text-[0.875rem] text-grey/700 font-medium">
             {type}
           </span>
@@ -119,12 +185,12 @@ export default function Leaderboard() {
             <table className="flex flex-col w-full">
               <thead className="flex w-full max-md:w-fit border-b border-primary/100 py-3 pl-6 font-medium text-grey/700 max-md:text-[0.875rem]  pr-16">
                 <tr className="flex gap-4 justify-between w-full">
-                  <th className="flex min-w-[10rem]">
+                  <th className="flex min-w-[15rem]">
                     <span className="flex font-medium text-grey/700 text-nowrap">
                       Token name + Symbol
                     </span>
                   </th>
-                  <th className="flex min-w-[4rem]">
+                  <th className="flex min-w-[6rem]">
                     <span className="flex font-medium text-grey/700 text-nowrap">
                       Type
                     </span>
@@ -147,179 +213,22 @@ export default function Leaderboard() {
                 </tr>
               </thead>
               <tbody className="flex flex-col pl-6 py-4 pr-16">
-                {[
-                  {
-                    token: "Univeristy",
-                    symbol: "UNI",
-                    logo: logo,
-                    xHandle: "@University",
-                    type: "Utility",
-                    liquidity: "$10,000.37",
-                    holders: "149,384",
-                    pointsEarned: "23,000,000 EP",
-                  },
-                  {
-                    token: "Univeristy",
-                    symbol: "UNI",
-                    logo: logo,
-                    xHandle: "@University",
-                    type: "Utility",
-                    liquidity: "$10,000.37",
-                    holders: "149,384",
-                    pointsEarned: "23,000,000 EP",
-                  },
-                  {
-                    token: "Univeristy",
-                    symbol: "UNI",
-                    logo: logo,
-                    xHandle: "@University",
-                    type: "Utility",
-                    liquidity: "$10,000.37",
-                    holders: "149,384",
-                    pointsEarned: "23,000,000 EP",
-                  },
-                  {
-                    token: "Univeristy",
-                    symbol: "UNI",
-                    logo: logo,
-                    xHandle: "@University",
-                    type: "Utility",
-                    liquidity: "$10,000.37",
-                    holders: "149,384",
-                    pointsEarned: "23,000,000 EP",
-                  },
-                  {
-                    token: "Univeristy",
-                    symbol: "UNI",
-                    logo: logo,
-                    xHandle: "@University",
-                    type: "Utility",
-                    liquidity: "$10,000.37",
-                    holders: "149,384",
-                    pointsEarned: "23,000,000 EP",
-                  },
-                  {
-                    token: "Univeristy",
-                    symbol: "UNI",
-                    logo: logo,
-                    xHandle: "@University",
-                    type: "Utility",
-                    liquidity: "$10,000.37",
-                    holders: "149,384",
-                    pointsEarned: "23,000,000 EP",
-                  },
-                  {
-                    token: "Univeristy",
-                    symbol: "UNI",
-                    logo: logo,
-                    xHandle: "@University",
-                    type: "Utility",
-                    liquidity: "$10,000.37",
-                    holders: "149,384",
-                    pointsEarned: "23,000,000 EP",
-                  },
-                  {
-                    token: "Univeristy",
-                    symbol: "UNI",
-                    logo: logo,
-                    xHandle: "@University",
-                    type: "Utility",
-                    liquidity: "$10,000.37",
-                    holders: "149,384",
-                    pointsEarned: "23,000,000 EP",
-                  },
-                  {
-                    token: "Univeristy",
-                    symbol: "UNI",
-                    logo: logo,
-                    xHandle: "@University",
-                    type: "Utility",
-                    liquidity: "$10,000.37",
-                    holders: "149,384",
-                    pointsEarned: "23,000,000 EP",
-                  },
-                  {
-                    token: "Univeristy",
-                    symbol: "UNI",
-                    logo: logo,
-                    xHandle: "@University",
-                    type: "Utility",
-                    liquidity: "$10,000.37",
-                    holders: "149,384",
-                    pointsEarned: "23,000,000 EP",
-                  },
-                  {
-                    token: "Univeristy",
-                    symbol: "UNI",
-                    logo: logo,
-                    xHandle: "@University",
-                    type: "Utility",
-                    liquidity: "$10,000.37",
-                    holders: "149,384",
-                    pointsEarned: "23,000,000 EP",
-                  },
-                  {
-                    token: "Univeristy",
-                    symbol: "UNI",
-                    logo: logo,
-                    xHandle: "@University",
-                    type: "Utility",
-                    liquidity: "$10,000.37",
-                    holders: "149,384",
-                    pointsEarned: "23,000,000 EP",
-                  },
-                  {
-                    token: "Univeristy",
-                    symbol: "UNI",
-                    logo: logo,
-                    xHandle: "@University",
-                    type: "Utility",
-                    liquidity: "$10,000.37",
-                    holders: "149,384",
-                    pointsEarned: "23,000,000 EP",
-                  },
-                  {
-                    token: "Univeristy",
-                    symbol: "UNI",
-                    logo: logo,
-                    xHandle: "@University",
-                    type: "Utility",
-                    liquidity: "$10,000.37",
-                    holders: "149,384",
-                    pointsEarned: "23,000,000 EP",
-                  },
-                  {
-                    token: "Univeristy",
-                    symbol: "UNI",
-                    logo: logo,
-                    xHandle: "@University",
-                    type: "Utility",
-                    liquidity: "$10,000.37",
-                    holders: "149,384",
-                    pointsEarned: "23,000,000 EP",
-                  },
-                  {
-                    token: "Univeristy",
-                    symbol: "UNI",
-                    logo: logo,
-                    xHandle: "@University",
-                    type: "Utility",
-                    liquidity: "$10,000.37",
-                    holders: "149,384",
-                    pointsEarned: "23,000,000 EP",
-                  },
-                  {
-                    token: "Univeristy",
-                    symbol: "UNI",
-                    logo: logo,
-                    xHandle: "@University",
-                    type: "Utility",
-                    liquidity: "$10,000.37",
-                    holders: "149,384",
-                    pointsEarned: "23,000,000 EP",
-                  },
-                ].map((item, index) => {
-                  return <TableRow key={index} {...item} />;
+                {tokens.map((item, index) => {
+                  console.log(item.Liquidity);
+
+                  return (
+                    <TableRow
+                      key={index}
+                      token={item.name}
+                      xHandle={item.xUrl}
+                      symbol={item.symbol}
+                      logo={item.logoUrl}
+                      type={item.category?.name || "Others"}
+                      liquidity={item.Liquidity?.[0]?.baseAmount || "0.00 EDU"}
+                      pointsEarned={item.points.toLocaleString()}
+                      tokenAddress={item.contract}
+                    />
+                  );
                 })}
               </tbody>
             </table>
