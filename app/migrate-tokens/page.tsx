@@ -42,6 +42,7 @@ export default function MigrateTokens() {
             nextStep={nextStep}
             prevStep={prevStep}
             tokenDetails={tokenDetails}
+            verificationPrev={verificationPrev}
           />
           <DeployForm
             formStep={formStep}

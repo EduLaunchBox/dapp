@@ -47,11 +47,11 @@ export type NetworkType = {
   explorerUrl?: string;
 };
 
-type Dex = {
-  id?: number;
-  name?: string;
-  logoUrl?: string;
-};
+// type Dex = {
+//   id?: number;
+//   name?: string;
+//   logoUrl?: string;
+// };
 
 export type UserType = {
   address?: string;
@@ -67,5 +67,5 @@ export type LiquidityType = {
   createdAt?: string;
   updatedAt?: string;
   token?: TokenType;
-  dex?: Dex;
+  dex?: string;
 };

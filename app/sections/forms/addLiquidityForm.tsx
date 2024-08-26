@@ -269,10 +269,10 @@ export default function AddLiquidityForm({
             </span>
           </div>
           <p className="text-wrap text-pretty max-w-[28rem] text-primary/300 text-[0.875rem]">
-            <span className="font-bold">Note:</span> Lorem ipsum dolor sit amet,
-            consectetur adipiscing elit. Duis in ante in eros hendrerit pharetra
-            non eu ex. Phasellus mattis, lectus nec facilisis sollicitudin, est
-            enim blandit nibh.
+            <span className="font-bold">Note:</span> Here, you can choose to add
+            liquidity to your token immediately after deployment. Adding
+            liquidity is crucial for enabling trading on decentralized
+            exchanges.
           </p>
         </div>
       </div>
@@ -283,6 +283,7 @@ export default function AddLiquidityForm({
           labelName={"Select dex to add liquidity to:"}
           id={"addLiquidity"}
           setValue={setDex}
+          helpInfo="Choose the decentralized exchange (DEX) where you want to provide liquidity. SailFish is the default DEX for tokens on EduChain."
         >
           <option value={dex} className="flex gap-2 p-1 text-grey/800">
             {dex}

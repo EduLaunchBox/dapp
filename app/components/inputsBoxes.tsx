@@ -4,15 +4,39 @@ import React, { Dispatch, SetStateAction, useState } from "react";
 import { AiOutlineInfoCircle } from "react-icons/ai";
 import { FaPaste } from "react-icons/fa";
 import { FiUploadCloud } from "react-icons/fi";
+import { SmallDialogue } from "./infoDialogue";
 
-export function Label({ text, htmlFor }: { text: string; htmlFor: string }) {
+export function Label({
+  text,
+  htmlFor,
+  helpInfo,
+}: {
+  text: string;
+  htmlFor: string;
+  helpInfo?: string;
+}) {
+  const [showHelp, setShowHelp] = useState(false);
   return (
     <label className="flex justify-between w-full" htmlFor={htmlFor}>
       <span className="font-semibold my-auto max-sm:text-[0.875rem]">
         {text}
       </span>
-      <span className="cusor-pointer my-auto">
+      <span
+        onMouseEnter={() => setShowHelp(true)}
+        onMouseLeave={() => setShowHelp(false)}
+        className="cusor-pointer my-auto relative"
+      >
         <AiOutlineInfoCircle size={"1.2rem"} className="text-grey/500" />
+        {helpInfo && (
+          <div
+            className={
+              (showHelp ? "flex" : "hidden") +
+              " absolute bottom-[2rem] left-[-15rem] z-50 min-w-[30rem]"
+            }
+          >
+            <SmallDialogue content={helpInfo} />
+          </div>
+        )}
       </span>
     </label>
   );
@@ -33,6 +57,7 @@ export function SelectInput({
   setValue,
   labelName,
   children,
+  helpInfo,
 }: {
   errMsg?: string;
   labelName: string;
@@ -40,13 +65,14 @@ export function SelectInput({
   value?: string;
   setValue: Dispatch<SetStateAction<string>>;
   children: React.ReactNode;
+  helpInfo?: string;
 }) {
   const [isActive, setIsActive] = useState<boolean>(false);
   const [isHoveredOver, setIsHoveredOver] = useState<boolean>(false);
 
   return (
     <div className="flex flex-col gap-2">
-      <Label text={labelName} htmlFor={id} />
+      <Label text={labelName} htmlFor={id} helpInfo={helpInfo} />
       <div
         className={
           (isHoveredOver ? "  border-primary/200 " : "") +
@@ -84,6 +110,7 @@ export function Input({
   labelName,
   className,
   disabled,
+  helpInfo,
 }: {
   type?: "default" | "link" | "paste";
   errMsg?: string;
@@ -95,6 +122,7 @@ export function Input({
   setValue: Dispatch<SetStateAction<any>>;
   className?: string;
   disabled?: boolean;
+  helpInfo?: string;
 }) {
   const [isActive, setIsActive] = useState<boolean>(false);
   const [isHoveredOver, setIsHoveredOver] = useState<boolean>(false);
@@ -117,7 +145,7 @@ export function Input({
 
   return (
     <div className={(className ? className : "") + " flex flex-col gap-2"}>
-      <Label text={labelName} htmlFor={id} />
+      <Label text={labelName} htmlFor={id} helpInfo={helpInfo} />
       <div
         className={
           (isHoveredOver ? "  border-primary/200 " : "") +
@@ -182,10 +210,12 @@ export function ImageInput({
   labelText,
   id,
   setImage,
+  helpInfo,
 }: {
   id: string;
   labelText: string;
   setImage: Dispatch<any>;
+  helpInfo?: string;
 }) {
   const [preview, setPreview] = useState<any>();
 
@@ -204,7 +234,7 @@ export function ImageInput({
 
   return (
     <div className="flex gap-2 flex-col">
-      <Label text={labelText} htmlFor={id} />
+      <Label text={labelText} htmlFor={id} helpInfo={helpInfo} />
       <label
         className="border-2 border border-dashed rounded-md flex max-xs:px-3 px-6 py-10 max-xs:gap-2 gap-4 justify-between"
         htmlFor={id}
@@ -244,6 +274,7 @@ export function ImageInput({
         required
         id={id}
         type="file"
+        accept="image/*"
         onChange={handleChange}
         className="hidden"
       />

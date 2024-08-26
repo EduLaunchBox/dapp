@@ -38,6 +38,7 @@ export default function VerifyTokenDetailsForm({
   const [logoUrl, setLogoUrl] = useState<string>();
   const [decimals, setDecimals] = useState<number>();
   const [btnLoading, setBtnLoading] = useState(false);
+  const [agreed, setAgreed] = useState(true);
 
   const dispatch = useAppDispatch();
   const TOKEN_DETAILS_API = {
@@ -190,7 +191,10 @@ export default function VerifyTokenDetailsForm({
         </div>
 
         <div className="flex gap-2">
-          <button className="flex p-2 border border-grey/200 bg-grey/70 rounded-lg">
+          <button
+            type={"button"}
+            className="flex p-2 border border-grey/200 bg-grey/70 rounded-lg"
+          >
             <CiSettings size={"1.5rem"} color="#333333" />
           </button>
           <span className="flex font-bold text-[0.875rem] text-grey/700 my-auto">
@@ -199,7 +203,12 @@ export default function VerifyTokenDetailsForm({
         </div>
 
         <div className="flex gap-2 px-2">
-          <input id="migationConsent" type={"checkbox"} />
+          <input
+            checked={agreed}
+            onChange={() => setAgreed(!agreed)}
+            id="migationConsent"
+            type={"checkbox"}
+          />
           <label htmlFor="migationConsent">
             <span className="flex text-grey/700 text-[0.875rem]">
               I agree to the token migration settings.
@@ -215,6 +224,7 @@ export default function VerifyTokenDetailsForm({
           text={"Next"}
           loading={btnLoading}
           color="green"
+          disabled={!agreed}
         />
       </div>
     </FormContainer>

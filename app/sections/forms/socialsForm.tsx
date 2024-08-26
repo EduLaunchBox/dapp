@@ -13,10 +13,12 @@ export default function SocialsForm({
   nextStep,
   prevStep,
   tokenDetails,
+  verificationPrev,
 }: {
   formStep: number;
   nextStep: ActionCreatorWithPayload<TokenDetails, any>;
   prevStep: any;
+  verificationPrev?: any;
   tokenDetails: TokenDetails;
 }) {
   const [logo, setLogo] = useState<any>();
@@ -53,6 +55,7 @@ export default function SocialsForm({
   ) => {
     event.preventDefault();
     dispatch(prevStep());
+    if (verificationPrev) dispatch(verificationPrev());
   };
 
   return (
@@ -65,6 +68,7 @@ export default function SocialsForm({
         setImage={setLogo}
         labelText={"Token Logo"}
         id={`tokenName-${formStep}`}
+        helpInfo="Upload a logo that represents your token. Recommended dimensions: 128x128 pixels in PNG format for optimal display across platforms."
       />
 
       <Input
@@ -73,6 +77,7 @@ export default function SocialsForm({
         placeholder={"Enter X Url"}
         value={twitterUrl}
         setValue={setTwitterUrl}
+        helpInfo="Provide your project’s official Twitter URL. This helps with verification and allows users to follow your project’s updates easily."
       />
 
       <div className="flex justify-between max-sm:pt-0 pt-4 gap-6">

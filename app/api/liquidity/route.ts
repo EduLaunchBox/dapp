@@ -3,30 +3,30 @@ import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
   const data = await request.json();
-  const { token, dex, quoteAmount, baseAmount } = data;
+  const { token, quoteAmount, baseAmount } = data;
 
   if (!token) {
     throw new Error("Token is required");
   }
 
   // Find the dex by name
-  let dexRecord = null;
-  if (dex) {
-    dexRecord = await prisma.dex.findFirst({
-      where: {
-        name: dex,
-      },
-    });
+  // let dexRecord = null;
+  // if (dex) {
+  //   dexRecord = await prisma.dex.findFirst({
+  //     where: {
+  //       name: dex,
+  //     },
+  //   });
 
-    // If dex does not exist, create it
-    if (!dexRecord) {
-      dexRecord = await prisma.dex.create({
-        data: {
-          name: dex,
-        },
-      });
-    }
-  }
+  //   // If dex does not exist, create it
+  //   if (!dexRecord) {
+  //     dexRecord = await prisma.dex.create({
+  //       data: {
+  //         name: dex,
+  //       },
+  //     });
+  //   }
+  // }
 
   // Get token update it with points
   const pointsAwarded =
@@ -55,7 +55,6 @@ export async function POST(request: Request) {
         id: existingLiquidity.id,
       },
       data: {
-        dexId: dexRecord?.id,
         quoteAmount: quoteAmount,
         baseAmount: baseAmount,
       },
@@ -104,7 +103,6 @@ export async function GET(request: Request) {
       take: limit,
       include: {
         token: true,
-        dex: true,
       },
       where: {
         token: {
