@@ -231,9 +231,9 @@ export default function Liquidity() {
                         symbol={item.token?.symbol!}
                         logo={item.token?.logoUrl}
                         address={item.token?.contract!}
-                        dex={item.dex?.name || "No Dex"}
-                        dexLogo={item.dex?.logoUrl || sailfishLogo}
-                        hasLiquity={Boolean(item?.dex)}
+                        dex={item.dex || "No Dex"}
+                        dexLogo={sailfishLogo}
+                        hasLiquity={Boolean(item?.baseAmount)}
                         eduAmt={item.baseAmount || ""}
                         uniAmt={item?.quoteAmount || ""}
                         worthUsdt={""}

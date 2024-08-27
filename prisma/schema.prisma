@@ -44,12 +44,12 @@ model Token {
   Liquidity   Liquidity[]
 }
 
-model Dex {
-  id        Int         @id @default(autoincrement())
-  name      String
-  logoUrl   String?
-  Liquidity Liquidity[]
-}
+// model Dex {
+//   id        Int         @id @default(autoincrement())
+//   name      String
+//   logoUrl   String?
+//   Liquidity Liquidity[]
+// }
 
 model ProjectCategory {
   id    Int     @id @default(autoincrement())
@@ -67,8 +67,7 @@ model Liquidity {
   id          Int      @id @default(autoincrement())
   token       Token    @relation(fields: [tokenId], references: [id])
   tokenId     Int
-  dex         Dex?      @relation(fields: [dexId], references: [id])
-  dexId       Int?
+  dex         String   @default("Sailfish")
   quoteAmount String?
   baseAmount  String?
   createdAt   DateTime @default(now())

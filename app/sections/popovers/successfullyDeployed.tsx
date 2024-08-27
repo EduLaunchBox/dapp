@@ -1,11 +1,14 @@
+"use client";
 import { Button } from "@/app/components/buttons";
 import Image from "next/image";
 import { FiCopy } from "react-icons/fi";
+import { LuCopyCheck } from "react-icons/lu";
 import { MdOutlineNorthEast } from "react-icons/md";
 import deployedPng from "../../assets/images/deployed.png";
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import PopoverContainer from "./popoverContainer";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function SuccessfullyDeployed({
   type,
@@ -20,6 +23,8 @@ export default function SuccessfullyDeployed({
   tokenAddress: string;
   setShow: Dispatch<SetStateAction<boolean>>;
 }) {
+  const router = useRouter();
+
   const ContractAddress = ({
     type,
     address,
@@ -27,6 +32,7 @@ export default function SuccessfullyDeployed({
     type: string;
     address: string;
   }) => {
+    const [copied, setCopied] = useState(false);
     return (
       <div className="flex flex-col gap-1">
         <span className="flex text-[0.875rem] font-bold text-[#646464]">
@@ -40,8 +46,17 @@ export default function SuccessfullyDeployed({
           </span>
 
           <div className="flex gap-2">
-            <button className="bg-grey/70 border border-grey/200 p-2 rounded-lg">
-              <FiCopy size={"1.2rem"} />
+            <button
+              type={"button"}
+              onClick={() =>
+                navigator.clipboard
+                  .writeText(address)
+                  .then(() => setCopied(true))
+              }
+              className="bg-grey/70 border border-grey/200 p-2 rounded-lg"
+            >
+              {!copied && <FiCopy size={"1.2rem"} />}
+              {copied && <LuCopyCheck size={"1.2rem"} />}
             </button>
             <Link
               target={"_blank"}
@@ -63,6 +78,7 @@ export default function SuccessfullyDeployed({
       className="flex my-auto bg-white z-10 flex-col gap-6 p-4 rounded-2xl"
       show={show}
       setShow={setShow}
+      callback={() => router.push("/")}
     >
       <div className="flex justify-center bg-primary/50 border border-primary/100 rounded-xl w-full h-52">
         <Image
@@ -101,7 +117,13 @@ export default function SuccessfullyDeployed({
       </div>
 
       <div>
-        <Button onclick={() => setShow(false)} text="Close" />
+        <Button
+          onclick={() => {
+            setShow(false);
+            router.push("/");
+          }}
+          text="Close"
+        />
       </div>
     </PopoverContainer>
   );

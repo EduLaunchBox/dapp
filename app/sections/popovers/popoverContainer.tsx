@@ -5,18 +5,23 @@ export default function PopoverContainer({
   setShow,
   className,
   children,
+  callback,
 }: {
   show: boolean;
   setShow: Dispatch<SetStateAction<boolean>>;
   className: string;
   children: React.ReactNode;
+  callback?: any;
 }) {
   const [canDisable, setCanDisable] = useState(false);
 
   return (
     <div
       onClick={() => {
-        if (canDisable) setShow(false);
+        if (canDisable) {
+          setShow(false);
+          if (callback) callback();
+        }
       }}
       className={
         (show ? "flex" : "hidden") +

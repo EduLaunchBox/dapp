@@ -21,7 +21,7 @@ export default function TokenDetailsForm({
   const [errMsg, setErrMsg] = useState("");
 
   const [tokenSupply, setTokenSupply] = useState<number>();
-  const [decimal, setDecimal] = useState<number>();
+  const [decimal, setDecimal] = useState<number>(18);
   const dispatch = useAppDispatch();
 
   const handleNext = (
@@ -72,6 +72,7 @@ export default function TokenDetailsForm({
         setValue={setProjectCategory}
         labelName={"Project Category"}
         value={projectCategory}
+        helpInfo="Select the category that best describes your project’s focus or industry (e.g., Education, Finance, Gaming). This helps in classifying and discovering your token within the ecosystem."
       >
         <option disabled value={""}>
           Select category that applies
@@ -103,6 +104,7 @@ export default function TokenDetailsForm({
         placeholder={"Enter name of Token in full"}
         value={tokenName}
         setValue={setTokenName}
+        helpInfo='This is the full name of your token (e.g., "EduToken"). Choose a name that reflects your project’s purpose and is easy to remember.'
       />
 
       <Input
@@ -111,6 +113,7 @@ export default function TokenDetailsForm({
         placeholder={"Enter token abbreviations"}
         value={tokenSymbol}
         setValue={setTokenSymbol}
+        helpInfo='The symbol is a short, unique identifier for your token (e.g., "EDU"). It typically consists of 3-5 uppercase letters.'
       />
 
       <div className="flex gap-4">
@@ -122,6 +125,7 @@ export default function TokenDetailsForm({
           value={tokenSupply}
           setValue={setTokenSupply}
           className="basis-2/3"
+          helpInfo="This is the total number of tokens that will be created. Consider the tokenomics of your project when deciding on the supply."
         />
 
         <Input
@@ -132,6 +136,7 @@ export default function TokenDetailsForm({
           value={decimal}
           setValue={setDecimal}
           className="basis-1/3"
+          helpInfo="Decimals determine how divisible your token is. For example, if set to 18, your token can be divided down to 18 decimal places, similar to how ETH works."
         />
       </div>
 
