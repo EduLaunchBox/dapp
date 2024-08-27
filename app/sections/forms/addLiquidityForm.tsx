@@ -87,7 +87,7 @@ export default function AddLiquidityForm({
       const imageBlob = await response.blob();
       const formData = new FormData();
 
-      formData.append("name", quoteToken?.name || "");
+      formData.append("name", quoteToken?.symbol || "");
       formData.append("address", quoteToken?.contract || "");
       formData.append("created_at", new Date().toISOString());
       formData.append("logo", imageBlob, "image.jpg");
