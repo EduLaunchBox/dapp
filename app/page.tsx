@@ -181,7 +181,7 @@ export default function Home() {
             Here are some of our most asked questions and their answers
           </span>
         </div>
-        <div className="flex flex-col max-sm:gap-1 gap-2 max-h-[20rem] overflow-y-auto">
+        <div className="flex flex-col max-sm:gap-1 gap-2">
           {[
             {
               question: "What is EduLaunchBox?",
@@ -211,7 +211,7 @@ export default function Home() {
             {
               question: "Which blockchains are compatible with EduLaunchBox?",
               answer:
-                "EduLaunchBox is designed to be compatible with EVM (Ethereum Virtual Machine) chains, enabling developers to easily migrate tokens and dApps from popular blockchains. Currently, Ethereum is supported, with upcoming support for Binance Smart Chain, Polygon, and others.",
+                "EduLaunchBox is designed to be compatible with EVM (Ethereum Virtual Machine) chains, enabling developers to easily migrate tokens and dApps from popular blockchains. Currently, Base is supported, with upcoming support for Binance Smart Chain, Polygon, and others.",
             },
             {
               question: "Can I migrate tokens from non-EVM chains to EduChain?",
