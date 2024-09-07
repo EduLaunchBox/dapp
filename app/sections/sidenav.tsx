@@ -47,11 +47,13 @@ export default function SideNav() {
     text,
     logo,
     active,
+    comingSoon,
   }: {
     href: string;
     text: string;
     active: boolean;
     logo: any;
+    comingSoon?: boolean;
   }) => {
     return (
       <Link
@@ -74,6 +76,11 @@ export default function SideNav() {
         >
           {text}
         </span>
+        {comingSoon && (
+          <span className="flex w-full flex-row-reverse">
+            <span className="text-[0.75rem] my-auto">Coming soon</span>
+          </span>
+        )}
       </Link>
     );
   };
@@ -125,6 +132,7 @@ export default function SideNav() {
             href="/airdrop"
             text="airdrop"
             logo={CoinSvg}
+            comingSoon
           />
           <NavItem
             active={pathname.includes("/dev")}
